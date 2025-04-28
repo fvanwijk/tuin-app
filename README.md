@@ -1,54 +1,23 @@
-# React + TypeScript + Vite
+# Tuin app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Manage your home garden.
+Initially only focus on Dutch users.
 
-Currently, two official plugins are available:
+## Tech
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Vite
+- React
+- Supabase
+- Tanstack React Query
+- TailwindCSS
 
-## Expanding the ESLint configuration
+## Features to be developed
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Manage plant collection
+- Calendar with gardening tasks
+- Alerts
+- 2D Planting plan
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Challenges
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+I doesn't look like there is an API with (Dutch) cultivated plants, so all the information need to be provided by the user. The Yarinde app comes close, but it has a lot of deep links/iframes to the Yarinde pages which is not very useful.
