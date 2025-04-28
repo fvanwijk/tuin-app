@@ -1,12 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "./lib/supabase/client";
+import { usePlants } from "./hooks/usePlants";
 
 function App() {
-  const { data: plants } = useQuery({
-    queryKey: ["plants"],
-    queryFn: async () => await supabase.from("plants").select(),
-    select: ({ data }) => data,
-  });
+  const { data: plants } = usePlants();
 
   return (
     <div className="container p-4">
