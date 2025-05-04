@@ -4,6 +4,7 @@ import { CalendarPage } from "../pages/CalendarPage";
 import { MyGardenPage } from "../pages/MyGardenPage";
 import { AccountPage } from "../pages/AccountPage";
 import { LoginPage } from "../pages/LoginPage";
+import { RegisterPage } from "../pages/RegisterPage";
 import { Layout } from "../components/Layout";
 import { protectedLoader, publicLoader } from "./auth";
 
@@ -12,6 +13,11 @@ export const createRouter = () =>
     {
       path: "/login",
       element: <LoginPage />,
+      loader: publicLoader,
+    },
+    {
+      path: "/register",
+      element: <RegisterPage />,
       loader: publicLoader,
     },
     {
