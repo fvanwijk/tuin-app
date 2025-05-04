@@ -2,9 +2,11 @@ import { redirect } from "react-router-dom";
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "./supabase/client";
 import { queryClient } from "./react-query";
+import { User } from "@supabase/supabase-js";
 
 export type AuthLoaderData = {
   isAuthenticated: boolean;
+  user?: User;
 };
 
 // Define a unique query key for authentication
@@ -30,24 +32,24 @@ export async function checkAuth(): Promise<AuthLoaderData> {
   try {
     // Use ensureQueryData to leverage React Query's caching
     const result = await queryClient.ensureQueryData(authQueryOptions);
-    return { isAuthenticated: result.isAuthenticated };
+    return result;
   } catch {
     return { isAuthenticated: false };
   }
 }
 
 export async function protectedLoader() {
-  const { isAuthenticated } = await checkAuth();
+  const result = await checkAuth();
 
-  if (!isAuthenticated) {
+  if (!result.isAuthenticated) {
     // Redirect to login if not authenticated
     return redirect("/login");
   }
 
-  return { isAuthenticated };
+  return result;
 }
 
 export async function publicLoader() {
-  const { isAuthenticated } = await checkAuth();
-  return { isAuthenticated };
+  const result = await checkAuth();
+  return result;
 }
