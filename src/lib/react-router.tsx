@@ -3,10 +3,17 @@ import { HomePage } from "../pages/HomePage";
 import { CalendarPage } from "../pages/CalendarPage";
 import { MyGardenPage } from "../pages/MyGardenPage";
 import { AccountPage } from "../pages/AccountPage";
+import { LoginPage } from "../pages/LoginPage";
 import { Layout } from "../components/Layout";
+import { protectedLoader, publicLoader } from "./auth";
 
 export const createRouter = () =>
   createBrowserRouter([
+    {
+      path: "/login",
+      element: <LoginPage />,
+      loader: publicLoader,
+    },
     {
       path: "/",
       element: <Layout />,
@@ -14,18 +21,22 @@ export const createRouter = () =>
         {
           index: true,
           element: <HomePage />,
+          loader: protectedLoader,
         },
         {
           path: "calendar",
           element: <CalendarPage />,
+          loader: protectedLoader,
         },
         {
           path: "my-garden",
           element: <MyGardenPage />,
+          loader: protectedLoader,
         },
         {
           path: "account",
           element: <AccountPage />,
+          loader: protectedLoader,
         },
       ],
     },

@@ -1,8 +1,14 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { supabase } from "../lib/supabase/client";
 
-export const Navigation = () => {
+interface NavigationProps {
+  isAuthenticated?: boolean;
+}
+
+export const Navigation = ({ isAuthenticated = false }: NavigationProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
@@ -14,6 +20,11 @@ export const Navigation = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
   };
 
   return (
@@ -40,21 +51,47 @@ export const Navigation = () => {
           } md:block w-full md:w-auto`}
         >
           <ul className="flex flex-col md:flex-row md:space-x-4 mt-4 md:mt-0">
-            {menuItems.map((item) => (
-              <li key={item.path} className="mb-2 md:mb-0">
+            {isAuthenticated &&
+              menuItems.map((item) => (
+                <li key={item.path} className="mb-2 md:mb-0">
+                  <Link
+                    to={item.path}
+                    className={`block p-2 hover:bg-green-600 rounded ${
+                      location.pathname === item.path
+                        ? "bg-green-600 font-bold"
+                        : ""
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+
+            {isAuthenticated ? (
+              <li className="mb-2 md:mb-0">
+                <button
+                  onClick={handleLogout}
+                  className="block p-2 hover:bg-green-600 rounded w-full text-left"
+                >
+                  Logout
+                </button>
+              </li>
+            ) : (
+              <li className="mb-2 md:mb-0">
                 <Link
-                  to={item.path}
+                  to="/login"
                   className={`block p-2 hover:bg-green-600 rounded ${
-                    location.pathname === item.path
+                    location.pathname === "/login"
                       ? "bg-green-600 font-bold"
                       : ""
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.label}
+                  Login
                 </Link>
               </li>
-            ))}
+            )}
           </ul>
         </div>
       </div>
