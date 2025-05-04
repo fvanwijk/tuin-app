@@ -23,6 +23,7 @@ export const createRouter = () =>
     {
       path: "/",
       element: <Layout />,
+      loader: protectedLoader,
       children: [
         {
           index: true,
