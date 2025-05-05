@@ -13,6 +13,7 @@ export interface PlantFormData {
   id?: string;
   name_nl?: string | null;
   name: string;
+  type?: string | null;
 }
 
 interface PlantFormProps {
@@ -23,9 +24,27 @@ interface PlantFormProps {
 
 // Common plant flower colors
 const COMMON_COLORS = [
-  "red", "pink", "orange", "yellow", 
-  "white", "cream", "blue", "purple", 
-  "green", "brown", "black", "mixed"
+  "red",
+  "pink",
+  "orange",
+  "yellow",
+  "white",
+  "cream",
+  "blue",
+  "purple",
+  "green",
+  "brown",
+  "black",
+  "mixed",
+];
+
+// Plant types
+const PLANT_TYPES = [
+  { value: "heester", label: "Heester" },
+  { value: "klimmer", label: "Klimmer" },
+  { value: "vaste_plant", label: "Vaste plant" },
+  { value: "tweejarige", label: "Tweejarige" },
+  { value: "eenjarige", label: "Eenjarige" },
 ];
 
 // Option type for react-select
@@ -41,56 +60,71 @@ export const PlantForm = ({
 }: PlantFormProps) => {
   const [name, setName] = useState(initialValues.name || "");
   const [nameDutch, setNameDutch] = useState(initialValues.name_nl || "");
-  
+  const [plantType, setPlantType] = useState<SelectOption | null>(
+    initialValues.type
+      ? {
+          value: initialValues.type,
+          label:
+            PLANT_TYPES.find((t) => t.value === initialValues.type)?.label ||
+            initialValues.type,
+        }
+      : null
+  );
+
   // Convert initialValues.color string to array of color options
-  const initialColors = initialValues.color 
-    ? initialValues.color.split(",").map(c => ({ 
-        value: c.trim(), 
-        label: c.trim().charAt(0).toUpperCase() + c.trim().slice(1) 
+  const initialColors = initialValues.color
+    ? initialValues.color.split(",").map((c) => ({
+        value: c.trim(),
+        label: c.trim().charAt(0).toUpperCase() + c.trim().slice(1),
       }))
     : [];
-  const [selectedColors, setSelectedColors] = useState<SelectOption[]>(initialColors);
-  
+  const [selectedColors, setSelectedColors] =
+    useState<SelectOption[]>(initialColors);
+
   const [comments, setComments] = useState(initialValues.comments || "");
   const [alive, setAlive] = useState(initialValues.alive !== false);
-  
+
   const { data: borders = [], isLoading: isBordersLoading } = useBorders();
-  
+
   // Convert initialValues.borders to format for react-select
-  const initialSelectedBorders = initialValues.borders 
-    ? initialValues.borders.map(border => ({ 
-        value: border.id, 
-        label: border.name 
+  const initialSelectedBorders = initialValues.borders
+    ? initialValues.borders.map((border) => ({
+        value: border.id,
+        label: border.name,
       }))
     : [];
-  const [selectedBorders, setSelectedBorders] = useState<SelectOption[]>(initialSelectedBorders);
+  const [selectedBorders, setSelectedBorders] = useState<SelectOption[]>(
+    initialSelectedBorders
+  );
 
   // Color options for the select input
-  const colorOptions = COMMON_COLORS.map(color => ({
+  const colorOptions = COMMON_COLORS.map((color) => ({
     value: color,
-    label: color.charAt(0).toUpperCase() + color.slice(1)
+    label: color.charAt(0).toUpperCase() + color.slice(1),
   }));
 
   // Border options for the select input
-  const borderOptions = borders.map(border => ({
+  const borderOptions = borders.map((border) => ({
     value: border.id,
-    label: border.name
+    label: border.name,
   }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Format the color value from the array of selected colors
-    const formattedColor = selectedColors.length > 0 
-      ? selectedColors.map(option => option.value).join(",") 
-      : null;
+    const formattedColor =
+      selectedColors.length > 0
+        ? selectedColors.map((option) => option.value).join(",")
+        : null;
 
     // Map selected border options back to PlantBorder objects
-    const formattedBorders = selectedBorders.length > 0
-      ? selectedBorders.map(option => 
-          borders.find(border => border.id === option.value)!
-        )
-      : [];
+    const formattedBorders =
+      selectedBorders.length > 0
+        ? selectedBorders.map(
+            (option) => borders.find((border) => border.id === option.value)!
+          )
+        : [];
 
     onSubmit({
       ...initialValues,
@@ -100,6 +134,7 @@ export const PlantForm = ({
       comments: comments || null,
       alive,
       borders: formattedBorders,
+      type: plantType?.value || null,
     });
   };
 
@@ -130,6 +165,24 @@ export const PlantForm = ({
           id="name_nl"
           value={nameDutch}
           onChange={(e) => setNameDutch(e.target.value)}
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="type"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Type
+        </label>
+        <Select
+          id="type"
+          options={PLANT_TYPES}
+          value={plantType}
+          onChange={(selected) => setPlantType(selected as SelectOption | null)}
+          placeholder="Selecteer type plant..."
+          className="text-sm"
+          classNamePrefix="react-select"
+          isClearable
         />
       </div>
       <div>
@@ -165,7 +218,9 @@ export const PlantForm = ({
             isMulti
             options={borderOptions}
             value={selectedBorders}
-            onChange={(selected) => setSelectedBorders(selected as SelectOption[])}
+            onChange={(selected) =>
+              setSelectedBorders(selected as SelectOption[])
+            }
             placeholder="Selecteer borders..."
             className="text-sm"
             classNamePrefix="react-select"

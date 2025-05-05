@@ -17,11 +17,8 @@ export const EditPlantPage = () => {
     isPending: isUpdating,
     error: updateError,
   } = useUpdatePlantMutation();
-  const {
-    mutate: deletePlant,
-    isPending: isDeleting,
-    error: deleteError,
-  } = useDeletePlantMutation();
+  const { mutate: deletePlant, isPending: isDeleting } =
+    useDeletePlantMutation();
   const { data: plant, isLoading, error } = usePlantByIdQuery(id);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
@@ -98,6 +95,7 @@ export const EditPlantPage = () => {
             id: plant.id,
             name_nl: plant.name_nl || "",
             name: plant.name,
+            type: plant.type,
           }}
           onSubmit={handleSubmit}
           isSubmitting={isUpdating}
