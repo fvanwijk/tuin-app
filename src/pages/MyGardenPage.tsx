@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { usePlantsQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 
-// Plant types mapping from values to display labels (same as in PlantForm.tsx)
 const PLANT_TYPE_LABELS: Record<string, string> = {
   heester: "Heester",
   klimmer: "Klimmer",
@@ -14,28 +13,20 @@ const PLANT_TYPE_LABELS: Record<string, string> = {
 export const MyGardenPage = () => {
   const { data: plants, isLoading, error } = usePlantsQuery();
 
-  // Parse color JSON string to an array of colors
-  const getColors = (colorJson: string | null): string[] => {
-    if (!colorJson) return [];
-    try {
-      return JSON.parse(colorJson);
-    } catch {
-      return [];
-    }
+  const getColors = (colorString: string | null): string[] => {
+    if (!colorString) return [];
+    return colorString.split(",").map((color) => color.trim());
   };
 
-  // Get display label for plant type
   const getPlantTypeLabel = (type: string | null): string => {
     if (!type) return "Overig";
     return PLANT_TYPE_LABELS[type] || type;
   };
 
-  // Group plants by type
   const groupPlantsByType = () => {
     if (!plants) return {};
 
     return plants.reduce((groups: Record<string, typeof plants>, plant) => {
-      // Use "Overig" (Other) as default if no type is specified
       const type = plant.type || "Overig";
       if (!groups[type]) {
         groups[type] = [];
@@ -131,7 +122,7 @@ export const MyGardenPage = () => {
                                 {getColors(plant.color).map((color, index) => (
                                   <span
                                     key={`${plant.id}-${color}-${index}`}
-                                    className={`h-4 w-4 rounded-full`}
+                                    className="h-4 w-4 rounded-full border border-gray-200"
                                     style={{ backgroundColor: color }}
                                     title={color}
                                   ></span>
