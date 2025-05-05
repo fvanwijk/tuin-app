@@ -5,6 +5,8 @@ import { MyGardenPage } from "../pages/MyGardenPage";
 import { AccountPage } from "../pages/AccountPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
+import { AddPlantPage } from "../pages/AddPlantPage";
+import { EditPlantPage } from "../pages/EditPlantPage";
 import { Layout } from "../components/Layout";
 import { protectedLoader, publicLoader } from "./auth";
 
@@ -43,6 +45,16 @@ export const createRouter = () =>
         {
           path: "account",
           element: <AccountPage />,
+          loader: protectedLoader,
+        },
+        {
+          path: "plants/add",
+          element: <AddPlantPage />,
+          loader: protectedLoader,
+        },
+        {
+          path: "plants/:id/edit",
+          element: <EditPlantPage />,
           loader: protectedLoader,
         },
       ],

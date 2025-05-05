@@ -14,16 +14,19 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -33,30 +36,36 @@ export type Database = {
           border_text: string | null
           color: string | null
           comments: string | null
+          created_at: string | null
           id: string
           name: string
           name_nl: string | null
           type: string | null
+          user_id: string
         }
         Insert: {
           alive?: boolean | null
           border_text?: string | null
           color?: string | null
           comments?: string | null
+          created_at?: string | null
           id?: string
           name: string
           name_nl?: string | null
           type?: string | null
+          user_id?: string
         }
         Update: {
           alive?: boolean | null
           border_text?: string | null
           color?: string | null
           comments?: string | null
+          created_at?: string | null
           id?: string
           name?: string
           name_nl?: string | null
           type?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -65,16 +74,19 @@ export type Database = {
           border_id: string
           created_at: string
           plant_id: string
+          user_id: string
         }
         Insert: {
           border_id: string
           created_at?: string
           plant_id: string
+          user_id?: string
         }
         Update: {
           border_id?: string
           created_at?: string
           plant_id?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -82,6 +94,13 @@ export type Database = {
             columns: ["border_id"]
             isOneToOne: false
             referencedRelation: "borders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plants_borders_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
             referencedColumns: ["id"]
           },
         ]
