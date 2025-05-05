@@ -3,6 +3,7 @@ import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import type { PlantBorder } from "../../api/fetchPlants";
 import { useBorders } from "../../hooks/usePlants";
+import Select from "react-select";
 
 export interface PlantFormData {
   alive?: boolean | null;
@@ -20,6 +21,19 @@ interface PlantFormProps {
   isSubmitting?: boolean;
 }
 
+// Common plant flower colors
+const COMMON_COLORS = [
+  "red", "pink", "orange", "yellow", 
+  "white", "cream", "blue", "purple", 
+  "green", "brown", "black", "mixed"
+];
+
+// Option type for react-select
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
 export const PlantForm = ({
   initialValues = { name: "" },
   onSubmit,
@@ -27,27 +41,56 @@ export const PlantForm = ({
 }: PlantFormProps) => {
   const [name, setName] = useState(initialValues.name || "");
   const [nameDutch, setNameDutch] = useState(initialValues.name_nl || "");
-  const [color, setColor] = useState<string>(initialValues.color || "");
+  
+  // Convert initialValues.color string to array of color options
+  const initialColors = initialValues.color 
+    ? initialValues.color.split(",").map(c => ({ 
+        value: c.trim(), 
+        label: c.trim().charAt(0).toUpperCase() + c.trim().slice(1) 
+      }))
+    : [];
+  const [selectedColors, setSelectedColors] = useState<SelectOption[]>(initialColors);
+  
   const [comments, setComments] = useState(initialValues.comments || "");
   const [alive, setAlive] = useState(initialValues.alive !== false);
-  const [selectedBorders, setSelectedBorders] = useState<PlantBorder[]>(
-    initialValues.borders || []
-  );
-
+  
   const { data: borders = [], isLoading: isBordersLoading } = useBorders();
+  
+  // Convert initialValues.borders to format for react-select
+  const initialSelectedBorders = initialValues.borders 
+    ? initialValues.borders.map(border => ({ 
+        value: border.id, 
+        label: border.name 
+      }))
+    : [];
+  const [selectedBorders, setSelectedBorders] = useState<SelectOption[]>(initialSelectedBorders);
+
+  // Color options for the select input
+  const colorOptions = COMMON_COLORS.map(color => ({
+    value: color,
+    label: color.charAt(0).toUpperCase() + color.slice(1)
+  }));
+
+  // Border options for the select input
+  const borderOptions = borders.map(border => ({
+    value: border.id,
+    label: border.name
+  }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Convert comma-separated colors to JSON array if needed
-    let formattedColor = null;
-    if (color.trim()) {
-      const colorArray = color
-        .split(",")
-        .map((c) => c.trim())
-        .filter(Boolean);
-      formattedColor = colorArray.length > 0 ? colorArray.join(",") : null;
-    }
+    // Format the color value from the array of selected colors
+    const formattedColor = selectedColors.length > 0 
+      ? selectedColors.map(option => option.value).join(",") 
+      : null;
+
+    // Map selected border options back to PlantBorder objects
+    const formattedBorders = selectedBorders.length > 0
+      ? selectedBorders.map(option => 
+          borders.find(border => border.id === option.value)!
+        )
+      : [];
 
     onSubmit({
       ...initialValues,
@@ -56,19 +99,7 @@ export const PlantForm = ({
       color: formattedColor,
       comments: comments || null,
       alive,
-      borders: selectedBorders,
-    });
-  };
-
-  // Handle border selection changes
-  const handleBorderChange = (borderId: string) => {
-    setSelectedBorders((prev) => {
-      // If already selected, remove it
-      if (prev.some(({ id }) => id === borderId)) {
-        return prev.filter(({ id }) => id !== borderId);
-      }
-      // Otherwise add it
-      return [...prev, borders.find((b) => b.id === borderId) as PlantBorder];
+      borders: formattedBorders,
     });
   };
 
@@ -103,48 +134,43 @@ export const PlantForm = ({
       </div>
       <div>
         <label
-          htmlFor="color"
-          className="block text-sm font-medium text-gray-700"
+          htmlFor="colors"
+          className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Kleuren (comma separated)
+          Kleuren
         </label>
-        <Input
-          id="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          placeholder="red, blue, green"
+        <Select
+          id="colors"
+          isMulti
+          options={colorOptions}
+          value={selectedColors}
+          onChange={(selected) => setSelectedColors(selected as SelectOption[])}
+          placeholder="Selecteer kleuren..."
+          className="text-sm"
+          classNamePrefix="react-select"
         />
       </div>
       <div>
         <label
           htmlFor="borders"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-gray-700 mb-1"
         >
           Borders
         </label>
-        <div className="mt-2 space-y-2">
-          {isBordersLoading ? (
-            <p className="text-gray-500 text-sm">Borders laden...</p>
-          ) : (
-            borders.map((border) => (
-              <div key={border.id} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={`border-${border.id}`}
-                  checked={selectedBorders.some((b) => b.id === border.id)}
-                  onChange={() => handleBorderChange(border.id)}
-                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                />
-                <label
-                  htmlFor={`border-${border.id}`}
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  {border.name}
-                </label>
-              </div>
-            ))
-          )}
-        </div>
+        {isBordersLoading ? (
+          <p className="text-gray-500 text-sm">Borders laden...</p>
+        ) : (
+          <Select
+            id="borders"
+            isMulti
+            options={borderOptions}
+            value={selectedBorders}
+            onChange={(selected) => setSelectedBorders(selected as SelectOption[])}
+            placeholder="Selecteer borders..."
+            className="text-sm"
+            classNamePrefix="react-select"
+          />
+        )}
       </div>
       <div>
         <label
