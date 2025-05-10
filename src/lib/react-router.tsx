@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "../pages/HomePage";
 import { CalendarPage } from "../pages/CalendarPage";
 import { MyGardenPage } from "../pages/MyGardenPage";
+import { BordersPage } from "../pages/BordersPage";
 import { AccountPage } from "../pages/AccountPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
@@ -40,6 +41,11 @@ export const createRouter = () =>
         {
           path: "my-garden",
           element: <MyGardenPage />,
+          loader: protectedLoader,
+        },
+        {
+          path: "borders",
+          element: <BordersPage />,
           loader: protectedLoader,
         },
         {

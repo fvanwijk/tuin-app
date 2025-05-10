@@ -44,9 +44,14 @@ export const MyGardenPage = () => {
     <div className="container p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Mijn tuin</h1>
-        <Link to="/plants/add">
-          <Button>Plant toevoegen</Button>
-        </Link>
+        <div className="flex gap-4">
+          <Link to="/borders">
+            <Button variant="secondary">Borders beheren</Button>
+          </Link>
+          <Link to="/plants/add">
+            <Button>Plant toevoegen</Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading && (
