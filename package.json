@@ -11,6 +11,7 @@
     "generate-types": "supabase gen types typescript --project-id rkiockcuapvnnxrdwrwn > ./src/lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@headlessui/react": "2.2.2",
     "@supabase/supabase-js": "2.49.4",
     "@tanstack/react-query": "5.74.7",
     "react": "^19.0.0",
