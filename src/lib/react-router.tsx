@@ -49,6 +49,16 @@ export const createRouter = () =>
           loader: protectedLoader,
         },
         {
+          path: "borders/new",
+          element: <BordersPage />,
+          loader: protectedLoader,
+        },
+        {
+          path: "borders/:id/edit",
+          element: <BordersPage />,
+          loader: protectedLoader,
+        },
+        {
           path: "account",
           element: <AccountPage />,
           loader: protectedLoader,

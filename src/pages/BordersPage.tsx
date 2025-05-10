@@ -1,55 +1,103 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
-import { Input } from "../components/ui/Input";
 import {
   useBordersQuery,
   useAddBorderMutation,
   useUpdateBorderMutation,
   useDeleteBorderMutation,
+  useBorderByIdQuery,
 } from "../hooks/useBorders";
 import type { BorderData } from "../api/fetchBorders";
+import {
+  BorderFormDialog,
+  DeleteBorderDialog,
+} from "../components/borders/BorderDialogs";
 
 export const BordersPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { id } = useParams<{ id: string }>();
+  const isNewRoute = location.pathname === "/borders/new";
+  const isEditRoute = location.pathname.includes("/edit") && !!id;
+
   const { data: borders, isLoading, error } = useBordersQuery();
+  const { data: borderToEdit } = useBorderByIdQuery(
+    isEditRoute ? id : undefined
+  );
   const addBorderMutation = useAddBorderMutation();
   const updateBorderMutation = useUpdateBorderMutation();
   const deleteBorderMutation = useDeleteBorderMutation();
 
-  const [newBorderName, setNewBorderName] = useState("");
+  // Only keep the dialog state for delete confirmation, since it doesn't have a dedicated route
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Form states
   const [editingBorder, setEditingBorder] = useState<BorderData | null>(null);
+  const [borderToDelete, setBorderToDelete] = useState<BorderData | null>(null);
 
-  const handleAddBorder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newBorderName.trim()) return;
+  // When route changes to /borders/:id/edit and we have the border data, update the editing state
+  useEffect(() => {
+    if (isEditRoute && borderToEdit) {
+      setEditingBorder(borderToEdit);
+    }
+  }, [isEditRoute, borderToEdit]);
 
-    try {
-      await addBorderMutation.mutateAsync({ name: newBorderName });
-      setNewBorderName("");
-    } catch (error) {
-      console.error("Failed to add border:", error);
+  const openEditDialog = (border: BorderData) => {
+    navigate(`/borders/${border.id}/edit`);
+  };
+
+  const openDeleteDialog = (border: BorderData) => {
+    setBorderToDelete(border);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const closeAddDialog = () => {
+    if (location.pathname === "/borders/new") {
+      navigate("/borders");
     }
   };
 
-  const handleUpdateBorder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingBorder || !editingBorder.name.trim()) return;
-
-    try {
-      await updateBorderMutation.mutateAsync(editingBorder);
-      setEditingBorder(null);
-    } catch (error) {
-      console.error("Failed to update border:", error);
+  const closeEditDialog = () => {
+    setEditingBorder(null);
+    if (location.pathname.includes("/edit")) {
+      navigate("/borders");
     }
   };
 
-  const handleDeleteBorder = async (id: string) => {
-    if (window.confirm("Weet je zeker dat je deze border wilt verwijderen?")) {
-      try {
-        await deleteBorderMutation.mutateAsync(id);
-      } catch (error) {
-        console.error("Failed to delete border:", error);
+  const closeDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+    setBorderToDelete(null);
+  };
+
+  const handleBorderSubmit = async (data: { name: string; id?: string }) => {
+    try {
+      if (data.id) {
+        // Update existing border
+        await updateBorderMutation.mutateAsync({
+          name: data.name,
+          id: data.id,
+        });
+        closeEditDialog();
+      } else {
+        // Add new border
+        await addBorderMutation.mutateAsync({ name: data.name });
+        closeAddDialog();
       }
+    } catch (error) {
+      console.error("Failed to save border:", error);
+    }
+  };
+
+  const handleDeleteBorder = async () => {
+    if (!borderToDelete) return;
+
+    try {
+      await deleteBorderMutation.mutateAsync(borderToDelete.id!);
+      closeDeleteDialog();
+    } catch (error) {
+      console.error("Failed to delete border:", error);
     }
   };
 
@@ -57,112 +105,80 @@ export const BordersPage = () => {
     <div className="container p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Borders beheren</h1>
+        <Link to="/borders/new">
+          <Button>Nieuwe border toevoegen</Button>
+        </Link>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Left column: Add/Edit border form */}
-        <div>
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">
-              {editingBorder ? "Border bewerken" : "Nieuwe border toevoegen"}
-            </h2>
-            <form
-              onSubmit={editingBorder ? handleUpdateBorder : handleAddBorder}
-            >
-              <div className="mb-4">
-                <label
-                  htmlFor="borderName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Naam
-                </label>
-                <Input
-                  id="borderName"
-                  type="text"
-                  value={editingBorder ? editingBorder.name : newBorderName}
-                  onChange={(e) =>
-                    editingBorder
-                      ? setEditingBorder({
-                          ...editingBorder,
-                          name: e.target.value,
-                        })
-                      : setNewBorderName(e.target.value)
-                  }
-                  placeholder="Naam van de border"
-                  required
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  type="submit"
-                  disabled={
-                    addBorderMutation.isPending ||
-                    updateBorderMutation.isPending
-                  }
-                >
-                  {editingBorder ? "Opslaan" : "Toevoegen"}
-                </Button>
-                {editingBorder && (
-                  <Button
-                    type="button"
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                    onClick={() => setEditingBorder(null)}
+      <Card>
+        <h2 className="text-xl font-semibold mb-4">Jouw borders</h2>
+        {isLoading && <p className="text-gray-600">Borders laden...</p>}
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            Er is een fout opgetreden bij het ophalen van de borders.
+          </div>
+        )}
+
+        {borders && borders.length === 0 && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
+            <p>Je hebt nog geen borders toegevoegd.</p>
+          </div>
+        )}
+
+        {borders && borders.length > 0 && (
+          <ul className="divide-y divide-gray-200">
+            {borders.map((border) => (
+              <li
+                key={border.id}
+                className="py-3 flex justify-between items-center"
+              >
+                <span className="text-gray-900">{border.name}</span>
+                <div className="flex gap-2">
+                  <button
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    onClick={() => openEditDialog(border)}
                   >
-                    Annuleren
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Card>
-        </div>
-
-        {/* Right column: List of borders */}
-        <div>
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Jouw borders</h2>
-            {isLoading && <p className="text-gray-600">Borders laden...</p>}
-
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                Er is een fout opgetreden bij het ophalen van de borders.
-              </div>
-            )}
-
-            {borders && borders.length === 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
-                <p>Je hebt nog geen borders toegevoegd.</p>
-              </div>
-            )}
-
-            {borders && borders.length > 0 && (
-              <ul className="divide-y divide-gray-200">
-                {borders.map((border) => (
-                  <li
-                    key={border.id}
-                    className="py-3 flex justify-between items-center"
+                    Bewerken
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    onClick={() => openDeleteDialog(border)}
                   >
-                    <span className="text-gray-900">{border.name}</span>
-                    <div className="flex gap-2">
-                      <button
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                        onClick={() => setEditingBorder(border)}
-                      >
-                        Bewerken
-                      </button>
-                      <button
-                        className="text-red-600 hover:text-red-800 text-sm font-medium"
-                        onClick={() => handleDeleteBorder(border.id)}
-                      >
-                        Verwijderen
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-        </div>
-      </div>
+                    Verwijderen
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      {/* Form Dialog for Add */}
+      <BorderFormDialog
+        isOpen={isNewRoute}
+        onClose={closeAddDialog}
+        onSubmit={handleBorderSubmit}
+        isSubmitting={addBorderMutation.isPending}
+      />
+
+      {/* Form Dialog for Edit */}
+      <BorderFormDialog
+        isOpen={isEditRoute}
+        onClose={closeEditDialog}
+        onSubmit={handleBorderSubmit}
+        isSubmitting={updateBorderMutation.isPending}
+        border={editingBorder}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteBorderDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={handleDeleteBorder}
+        isDeleting={deleteBorderMutation.isPending}
+        borderName={borderToDelete?.name}
+      />
     </div>
   );
 };
