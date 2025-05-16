@@ -10,8 +10,7 @@ export interface PlantTaskData {
   plant_id: string;
   title: string;
   description?: string | null;
-  week_number?: number | null;
-  completed?: boolean;
+  week_number: number;
 }
 
 export interface TaskWithPlantDetails {
@@ -19,8 +18,7 @@ export interface TaskWithPlantDetails {
   plant_id: string;
   title: string;
   description: string | null;
-  week_number: number | null;
-  completed: boolean;
+  week_number: number;
   created_at: string;
   user_id: string;
   plants: {
@@ -190,11 +188,7 @@ export async function fetchTaskById(id: string) {
 
 // Add a task
 export async function addTask(task: PlantTaskData) {
-  return await supabase
-    .from("plant_tasks")
-    .insert({ ...task, completed: task.completed || false })
-    .select()
-    .single();
+  return await supabase.from("plant_tasks").insert(task).select().single();
 }
 
 // Update a task

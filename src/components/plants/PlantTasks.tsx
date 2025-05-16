@@ -5,7 +5,6 @@ import {
   useAddTaskMutation,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
-  useCompleteTaskMutation,
 } from "../../hooks/usePlantTasks";
 import { Button } from "../ui/Button";
 import {
@@ -32,7 +31,6 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
   const addTaskMutation = useAddTaskMutation();
   const updateTaskMutation = useUpdateTaskMutation();
   const deleteTaskMutation = useDeleteTaskMutation();
-  const toggleCompletionMutation = useCompleteTaskMutation();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -67,14 +65,6 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
     }
   };
 
-  const handleToggleCompletion = (task: PlantTask) => {
-    toggleCompletionMutation.mutate({
-      plantId,
-      completed: !task.completed,
-      taskId: task.id,
-    });
-  };
-
   // Get current week number to highlight current week tasks
   const currentWeek = getWeekNumber(new Date());
 
@@ -103,34 +93,12 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
           {tasks?.map((task) => (
             <li key={task.id} className="py-4">
               <div className="flex items-start">
-                <div className="flex-shrink-0 pt-0.5">
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => handleToggleCompletion(task)}
-                    className="h-5 w-5 text-green-600 rounded focus:ring-green-500"
-                  />
-                </div>
                 <div className="ml-3 flex-1">
-                  <p
-                    className={`text-sm font-medium ${
-                      task.completed
-                        ? "line-through text-gray-500"
-                        : "text-gray-900"
-                    }`}
-                  >
+                  <p className="text-sm font-medium text-gray-900">
                     {task.title}
                   </p>
                   {task.description && (
-                    <p
-                      className={`text-sm ${
-                        task.completed
-                          ? "line-through text-gray-400"
-                          : "text-gray-600"
-                      }`}
-                    >
-                      {task.description}
-                    </p>
+                    <p className="text-sm text-gray-600">{task.description}</p>
                   )}
                   {task.week_number && (
                     <div
