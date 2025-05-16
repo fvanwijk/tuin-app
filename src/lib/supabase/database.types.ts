@@ -30,6 +30,86 @@ export type Database = {
         };
         Relationships: [];
       };
+      completed_tasks: {
+        Row: {
+          completed_at: string;
+          id: string;
+          plant_id: string;
+          task_id: string;
+          user_id: string;
+          year: number;
+        };
+        Insert: {
+          completed_at?: string;
+          id?: string;
+          plant_id: string;
+          task_id: string;
+          user_id: string;
+          year: number;
+        };
+        Update: {
+          completed_at?: string;
+          id?: string;
+          plant_id?: string;
+          task_id?: string;
+          user_id?: string;
+          year?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "completed_tasks_plant_id_fkey";
+            columns: ["plant_id"];
+            isOneToOne: false;
+            referencedRelation: "plants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "completed_tasks_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "plant_tasks";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      plant_tasks: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          plant_id: string;
+          title: string;
+          user_id: string;
+          week_number: number;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          plant_id: string;
+          title: string;
+          user_id: string;
+          week_number: number;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          plant_id?: string;
+          title?: string;
+          user_id?: string;
+          week_number?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "plant_tasks_plant_id_fkey";
+            columns: ["plant_id"];
+            isOneToOne: false;
+            referencedRelation: "plants";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       plants: {
         Row: {
           alive: boolean | null;
@@ -68,47 +148,6 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
-      };
-      plant_tasks: {
-        Row: {
-          id: string;
-          plant_id: string;
-          title: string;
-          description: string | null;
-          week_number: number | null;
-          completed: boolean;
-          created_at: string;
-          user_id: string;
-        };
-        Insert: {
-          id?: string;
-          plant_id: string;
-          title: string;
-          description?: string | null;
-          week_number?: number | null;
-          completed?: boolean;
-          created_at?: string;
-          user_id?: string;
-        };
-        Update: {
-          id?: string;
-          plant_id?: string;
-          title?: string;
-          description?: string | null;
-          week_number?: number | null;
-          completed?: boolean;
-          created_at?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "plant_tasks_plant_id_fkey";
-            columns: ["plant_id"];
-            isOneToOne: false;
-            referencedRelation: "plants";
-            referencedColumns: ["id"];
-          }
-        ];
       };
       plants_borders: {
         Row: {
@@ -173,7 +212,7 @@ export type Tables<
   }
     ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {

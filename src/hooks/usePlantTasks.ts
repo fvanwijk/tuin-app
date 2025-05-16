@@ -3,13 +3,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchTasksByPlantId,
   fetchAllTasks,
-  fetchCurrentWeekTasks,
-  fetchUpcomingTasks,
+  fetchTasksByWeek,
+  fetchTasksForWeeks,
   addTask,
   updateTask,
   deleteTask,
-  toggleTaskCompletion,
+  completeTask,
   PlantTaskData,
+  getWeekNumber,
 } from "../api/fetchPlantTasks";
 
 // Query hook for fetching tasks for a specific plant
@@ -38,28 +39,32 @@ export const useAllTasksQuery = () => {
   });
 };
 
-// Query hook for fetching current week's tasks
-export const useCurrentWeekTasksQuery = () => {
+// Query hook for fetching tasks for a specific week
+export const useWeekTasksQuery = (weekNumber: number) => {
   return useQuery({
-    queryKey: ["current-week-tasks"],
+    queryKey: ["week-tasks", weekNumber],
     queryFn: async () => {
-      const { data, error } = await fetchCurrentWeekTasks();
-      if (error) throw error;
-      return data;
+      const result = await fetchTasksByWeek(weekNumber);
+      return result.data || [];
     },
   });
 };
 
-// Query hook for fetching upcoming tasks
-export const useUpcomingTasksQuery = (weeksAhead?: number) => {
+// Query hook for fetching tasks for multiple weeks
+export const useWeeksTasksQuery = (startWeek: number, endWeek: number) => {
   return useQuery({
-    queryKey: ["upcoming-tasks", weeksAhead],
+    queryKey: ["weeks-tasks", startWeek, endWeek],
     queryFn: async () => {
-      const { data, error } = await fetchUpcomingTasks(weeksAhead);
-      if (error) throw error;
-      return data;
+      const result = await fetchTasksForWeeks(startWeek, endWeek);
+      return result.data || [];
     },
   });
+};
+
+// Query hook for fetching current week's tasks
+export const useCurrentWeekTasksQuery = () => {
+  const currentWeek = getWeekNumber(new Date());
+  return useWeekTasksQuery(currentWeek);
 };
 
 // Mutation hook for adding a task
@@ -73,8 +78,8 @@ export const useAddTaskMutation = () => {
         queryKey: ["plant-tasks", variables.plant_id],
       });
       queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["current-week-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["upcoming-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
     },
   });
 };
@@ -91,25 +96,32 @@ export const useUpdateTaskMutation = () => {
           queryKey: ["plant-tasks", variables.plant_id],
         });
         queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-        queryClient.invalidateQueries({ queryKey: ["current-week-tasks"] });
-        queryClient.invalidateQueries({ queryKey: ["upcoming-tasks"] });
+        queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
+        queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
       }
     },
   });
 };
 
-// Mutation hook for toggling task completion
-export const useToggleTaskCompletionMutation = () => {
+// Mutation hook for completing task for the current year
+export const useCompleteTaskMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, completed }: { id: string; completed: boolean }) =>
-      toggleTaskCompletion(id, completed),
+    mutationFn: ({
+      taskId,
+      plantId,
+      completed,
+    }: {
+      taskId: string;
+      plantId: string;
+      completed: boolean;
+    }) => completeTask(taskId, plantId, completed),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["plant-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["current-week-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["upcoming-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
     },
   });
 };
@@ -123,8 +135,8 @@ export const useDeleteTaskMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["plant-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["current-week-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["upcoming-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
     },
   });
 };

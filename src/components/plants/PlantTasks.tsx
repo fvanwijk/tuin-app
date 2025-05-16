@@ -5,7 +5,7 @@ import {
   useAddTaskMutation,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
-  useToggleTaskCompletionMutation,
+  useCompleteTaskMutation,
 } from "../../hooks/usePlantTasks";
 import { Button } from "../ui/Button";
 import {
@@ -32,7 +32,7 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
   const addTaskMutation = useAddTaskMutation();
   const updateTaskMutation = useUpdateTaskMutation();
   const deleteTaskMutation = useDeleteTaskMutation();
-  const toggleCompletionMutation = useToggleTaskCompletionMutation();
+  const toggleCompletionMutation = useCompleteTaskMutation();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -69,8 +69,9 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
 
   const handleToggleCompletion = (task: PlantTask) => {
     toggleCompletionMutation.mutate({
-      id: task.id,
+      plantId,
       completed: !task.completed,
+      taskId: task.id,
     });
   };
 

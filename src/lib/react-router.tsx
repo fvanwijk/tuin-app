@@ -39,6 +39,11 @@ export const createRouter = () =>
           loader: protectedLoader,
         },
         {
+          path: "calendar/:year/:week",
+          element: <CalendarPage />,
+          loader: protectedLoader,
+        },
+        {
           path: "my-garden",
           element: <MyGardenPage />,
           loader: protectedLoader,

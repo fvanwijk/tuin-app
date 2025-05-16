@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase/client";
 import type { Tables } from "../lib/supabase/database.types";
 
 export type PlantTask = Tables<"plant_tasks">;
+export type CompletedTask = Tables<"completed_tasks">;
 
 export interface PlantTaskData {
   id?: string;
@@ -13,6 +14,39 @@ export interface PlantTaskData {
   completed?: boolean;
 }
 
+export interface TaskWithPlantDetails {
+  id: string;
+  plant_id: string;
+  title: string;
+  description: string | null;
+  week_number: number | null;
+  completed: boolean;
+  created_at: string;
+  user_id: string;
+  plants: {
+    id: string;
+    name: string;
+    name_nl: string | null;
+  };
+  isCompletedThisYear?: boolean;
+}
+
+// Helper function to get ISO week number
+export function getWeekNumber(date: Date): number {
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
+// Get current year
+export function getCurrentYear(): number {
+  return new Date().getFullYear();
+}
+
+// Fetch tasks by plant ID
 export async function fetchTasksByPlantId(plant_id: string) {
   return await supabase
     .from("plant_tasks")
@@ -22,6 +56,7 @@ export async function fetchTasksByPlantId(plant_id: string) {
     .order("created_at", { ascending: false });
 }
 
+// Fetch all tasks
 export async function fetchAllTasks() {
   return await supabase
     .from("plant_tasks")
@@ -39,6 +74,103 @@ export async function fetchAllTasks() {
     .order("created_at", { ascending: false });
 }
 
+// Fetch tasks for a specific week
+export async function fetchTasksByWeek(weekNumber: number) {
+  const { data: tasks, error } = await supabase
+    .from("plant_tasks")
+    .select(
+      `
+      *,
+      plants (
+        id,
+        name,
+        name_nl
+      )
+    `
+    )
+    .eq("week_number", weekNumber)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  const currentYear = getCurrentYear();
+
+  // Get completed tasks for this year
+  const { data: completedTasks } = await supabase
+    .from("completed_tasks")
+    .select()
+    .eq("year", currentYear)
+    .in(
+      "task_id",
+      tasks.map((task) => task.id)
+    );
+
+  // Mark tasks that are completed for this year
+  const tasksWithCompletionStatus = tasks.map((task) => {
+    const isCompleted = completedTasks?.some(
+      (completed) => completed.task_id === task.id
+    );
+    return {
+      ...task,
+      isCompletedThisYear: !!isCompleted,
+    };
+  });
+
+  return { data: tasksWithCompletionStatus, error: null };
+}
+
+// Fetch tasks for multiple weeks
+export async function fetchTasksForWeeks(startWeek: number, endWeek: number) {
+  const { data: tasks, error } = await supabase
+    .from("plant_tasks")
+    .select(
+      `
+      *,
+      plants (
+        id,
+        name,
+        name_nl
+      )
+    `
+    )
+    .gte("week_number", startWeek)
+    .lte("week_number", endWeek)
+    .order("week_number", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  const currentYear = getCurrentYear();
+
+  // Get completed tasks for this year
+  const { data: completedTasks } = await supabase
+    .from("completed_tasks")
+    .select()
+    .eq("year", currentYear)
+    .in(
+      "task_id",
+      tasks.map((task) => task.id)
+    );
+
+  // Mark tasks that are completed for this year
+  const tasksWithCompletionStatus = tasks.map((task) => {
+    const isCompleted = completedTasks?.some(
+      (completed) => completed.task_id === task.id
+    );
+    return {
+      ...task,
+      isCompletedThisYear: !!isCompleted,
+    };
+  });
+
+  return { data: tasksWithCompletionStatus, error: null };
+}
+
+// Get task by ID
 export async function fetchTaskById(id: string) {
   return await supabase
     .from("plant_tasks")
@@ -56,6 +188,7 @@ export async function fetchTaskById(id: string) {
     .single();
 }
 
+// Add a task
 export async function addTask(task: PlantTaskData) {
   return await supabase
     .from("plant_tasks")
@@ -64,6 +197,7 @@ export async function addTask(task: PlantTaskData) {
     .single();
 }
 
+// Update a task
 export async function updateTask(task: PlantTaskData) {
   if (!task.id) {
     throw new Error("Task ID is required for updates");
@@ -77,17 +211,33 @@ export async function updateTask(task: PlantTaskData) {
     .single();
 }
 
-export async function toggleTaskCompletion(id: string, completed: boolean) {
-  return await supabase
-    .from("plant_tasks")
-    .update({ completed })
-    .eq("id", id)
-    .select()
-    .single();
-}
+// Mark a task as completed for the current year
+export async function completeTask(
+  taskId: string,
+  plantId: string,
+  completed: boolean
+) {
+  const currentYear = getCurrentYear();
 
-export async function deleteTask(id: string) {
-  return await supabase.from("plant_tasks").delete().eq("id", id);
+  if (completed) {
+    // Add to completed_tasks
+    return await supabase
+      .from("completed_tasks")
+      .insert({
+        task_id: taskId,
+        plant_id: plantId,
+        year: currentYear,
+      })
+      .select()
+      .single();
+  } else {
+    // Remove from completed_tasks
+    return await supabase
+      .from("completed_tasks")
+      .delete()
+      .eq("task_id", taskId)
+      .eq("year", currentYear);
+  }
 }
 
 // Get current week's tasks
@@ -95,53 +245,14 @@ export async function fetchCurrentWeekTasks() {
   const today = new Date();
   const currentWeek = getWeekNumber(today);
 
-  return await supabase
-    .from("plant_tasks")
-    .select(
-      `
-      *,
-      plants (
-        id,
-        name,
-        name_nl
-      )
-    `
-    )
-    .eq("week_number", currentWeek)
-    .eq("completed", false)
-    .order("created_at", { ascending: false });
+  return await fetchTasksByWeek(currentWeek);
 }
 
-// Get upcoming tasks for the next X weeks
-export async function fetchUpcomingTasks(weeksAhead: number = 4) {
-  const today = new Date();
-  const currentWeek = getWeekNumber(today);
-  const endWeek = Math.min(currentWeek + weeksAhead, 52); // Max 52 weeks in a year
+// Delete a task
+export async function deleteTask(id: string) {
+  // First delete any completed records for this task
+  await supabase.from("completed_tasks").delete().eq("task_id", id);
 
-  return await supabase
-    .from("plant_tasks")
-    .select(
-      `
-      *,
-      plants (
-        id,
-        name,
-        name_nl
-      )
-    `
-    )
-    .gte("week_number", currentWeek)
-    .lte("week_number", endWeek)
-    .eq("completed", false)
-    .order("week_number", { ascending: true });
-}
-
-// Helper function to get ISO week number
-export function getWeekNumber(date: Date): number {
-  const d = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-  );
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  // Then delete the task itself
+  return await supabase.from("plant_tasks").delete().eq("id", id);
 }
