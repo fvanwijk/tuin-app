@@ -11,6 +11,7 @@ import {
   completeTask,
   PlantTaskData,
   getWeekNumber,
+  getCurrentYear,
 } from "../api/fetchPlantTasks";
 
 // Query hook for fetching tasks for a specific plant
@@ -40,31 +41,23 @@ export const useAllTasksQuery = () => {
 };
 
 // Query hook for fetching tasks for a specific week
-export const useWeekTasksQuery = (weekNumber: number) => {
+export const useWeekTasksQuery = (
+  weekNumber: number,
+  year: number = getCurrentYear()
+) => {
   return useQuery({
-    queryKey: ["week-tasks", weekNumber],
+    queryKey: ["week-tasks", weekNumber, year],
     queryFn: async () => {
-      const result = await fetchTasksByWeek(weekNumber);
-      return result.data || [];
-    },
-  });
-};
-
-// Query hook for fetching tasks for multiple weeks
-export const useWeeksTasksQuery = (startWeek: number, endWeek: number) => {
-  return useQuery({
-    queryKey: ["weeks-tasks", startWeek, endWeek],
-    queryFn: async () => {
-      const result = await fetchTasksForWeeks(startWeek, endWeek);
+      const result = await fetchTasksByWeek(weekNumber, year);
       return result.data || [];
     },
   });
 };
 
 // Query hook for fetching current week's tasks
-export const useCurrentWeekTasksQuery = () => {
+export const useCurrentWeekTasksQuery = (year: number = getCurrentYear()) => {
   const currentWeek = getWeekNumber(new Date());
-  return useWeekTasksQuery(currentWeek);
+  return useWeekTasksQuery(currentWeek, year);
 };
 
 // Mutation hook for adding a task
@@ -103,7 +96,7 @@ export const useUpdateTaskMutation = () => {
   });
 };
 
-// Mutation hook for completing task for the current year
+// Mutation hook for completing task for a specific year
 export const useCompleteTaskMutation = () => {
   const queryClient = useQueryClient();
 
@@ -112,11 +105,13 @@ export const useCompleteTaskMutation = () => {
       taskId,
       plantId,
       completed,
+      year = getCurrentYear(),
     }: {
       taskId: string;
       plantId: string;
       completed: boolean;
-    }) => completeTask(taskId, plantId, completed),
+      year?: number;
+    }) => completeTask(taskId, plantId, completed, year),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["plant-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["all-tasks"] });

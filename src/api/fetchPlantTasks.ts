@@ -72,8 +72,11 @@ export async function fetchAllTasks() {
     .order("created_at", { ascending: false });
 }
 
-// Fetch tasks for a specific week
-export async function fetchTasksByWeek(weekNumber: number) {
+// Fetch tasks for a specific week with completion status for specified year
+export async function fetchTasksByWeek(
+  weekNumber: number,
+  year: number = getCurrentYear()
+) {
   const { data: tasks, error } = await supabase
     .from("plant_tasks")
     .select(
@@ -93,13 +96,11 @@ export async function fetchTasksByWeek(weekNumber: number) {
     throw error;
   }
 
-  const currentYear = getCurrentYear();
-
-  // Get completed tasks for this year
+  // Get completed tasks for the specified year
   const { data: completedTasks } = await supabase
     .from("completed_tasks")
     .select()
-    .eq("year", currentYear)
+    .eq("year", year)
     .in(
       "task_id",
       tasks.map((task) => task.id)
@@ -120,7 +121,11 @@ export async function fetchTasksByWeek(weekNumber: number) {
 }
 
 // Fetch tasks for multiple weeks
-export async function fetchTasksForWeeks(startWeek: number, endWeek: number) {
+export async function fetchTasksForWeeks(
+  startWeek: number,
+  endWeek: number,
+  year: number = getCurrentYear()
+) {
   const { data: tasks, error } = await supabase
     .from("plant_tasks")
     .select(
@@ -142,19 +147,17 @@ export async function fetchTasksForWeeks(startWeek: number, endWeek: number) {
     throw error;
   }
 
-  const currentYear = getCurrentYear();
-
-  // Get completed tasks for this year
+  // Get completed tasks for the specified year
   const { data: completedTasks } = await supabase
     .from("completed_tasks")
     .select()
-    .eq("year", currentYear)
+    .eq("year", year)
     .in(
       "task_id",
       tasks.map((task) => task.id)
     );
 
-  // Mark tasks that are completed for this year
+  // Mark tasks that are completed for the specified year
   const tasksWithCompletionStatus = tasks.map((task) => {
     const isCompleted = completedTasks?.some(
       (completed) => completed.task_id === task.id
@@ -205,14 +208,13 @@ export async function updateTask(task: PlantTaskData) {
     .single();
 }
 
-// Mark a task as completed for the current year
+// Mark a task as completed for a specific year
 export async function completeTask(
   taskId: string,
   plantId: string,
-  completed: boolean
+  completed: boolean,
+  year: number = getCurrentYear()
 ) {
-  const currentYear = getCurrentYear();
-
   if (completed) {
     // Add to completed_tasks
     return await supabase
@@ -220,7 +222,7 @@ export async function completeTask(
       .insert({
         task_id: taskId,
         plant_id: plantId,
-        year: currentYear,
+        year,
       })
       .select()
       .single();
@@ -230,7 +232,7 @@ export async function completeTask(
       .from("completed_tasks")
       .delete()
       .eq("task_id", taskId)
-      .eq("year", currentYear);
+      .eq("year", year);
   }
 }
 

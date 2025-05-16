@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import {
-  useWeeksTasksQuery,
+  useWeekTasksQuery,
   useCompleteTaskMutation,
 } from "../hooks/usePlantTasks";
 import {
@@ -34,6 +34,7 @@ export const CalendarPage = () => {
 
   // Handle year change for week transitions
   const nextWeekYear = week === 52 ? year + 1 : year;
+  const followingWeekYear = nextWeek === 52 ? nextWeekYear + 1 : nextWeekYear;
   const previousWeekYear = week === 1 ? year - 1 : year;
 
   // Years for the year selector (allow 5 years in past and 5 years in future)
@@ -42,25 +43,30 @@ export const CalendarPage = () => {
     (_, i) => currentSystemYear - 5 + i
   );
 
-  // Fetch tasks for the selected week and next two weeks
+  // Fetch tasks for each week individually
   const {
-    data: tasks = [],
-    isLoading,
-    error,
-  } = useWeeksTasksQuery(week, followingWeek === 1 ? 52 : followingWeek);
+    data: currentWeekTasks = [],
+    isLoading: isLoadingCurrentWeek,
+    error: currentWeekError,
+  } = useWeekTasksQuery(week, year);
+
+  const {
+    data: nextWeekTasks = [],
+    isLoading: isLoadingNextWeek,
+    error: nextWeekError,
+  } = useWeekTasksQuery(nextWeek, nextWeekYear);
+
+  const {
+    data: followingWeekTasks = [],
+    isLoading: isLoadingFollowingWeek,
+    error: followingWeekError,
+  } = useWeekTasksQuery(followingWeek, followingWeekYear);
 
   const completeTaskMutation = useCompleteTaskMutation();
 
-  // Group tasks by week
-  const tasksByWeek: Record<number, TaskWithPlantDetails[]> = {};
-  tasks.forEach((task) => {
-    if (task.week_number) {
-      if (!tasksByWeek[task.week_number]) {
-        tasksByWeek[task.week_number] = [];
-      }
-      tasksByWeek[task.week_number].push(task);
-    }
-  });
+  const isLoading =
+    isLoadingCurrentWeek || isLoadingNextWeek || isLoadingFollowingWeek;
+  const hasError = currentWeekError || nextWeekError || followingWeekError;
 
   // Handle direct navigation to another week
   const handleWeekChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -76,10 +82,21 @@ export const CalendarPage = () => {
 
   // Handle task completion toggle
   const handleTaskCompletion = (task: TaskWithPlantDetails) => {
+    // Determine which year the task belongs to
+    let taskYear;
+    if (task.week_number === week) {
+      taskYear = year;
+    } else if (task.week_number === nextWeek) {
+      taskYear = nextWeekYear;
+    } else {
+      taskYear = followingWeekYear;
+    }
+
     completeTaskMutation.mutate({
       taskId: task.id,
       plantId: task.plant_id,
       completed: !task.isCompletedThisYear,
+      year: taskYear,
     });
   };
 
@@ -193,45 +210,47 @@ export const CalendarPage = () => {
         </div>
       )}
 
-      {error && (
+      {hasError && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Er is een fout opgetreden bij het ophalen van de taken.
         </div>
       )}
 
-      {!isLoading && !error && (
+      {!isLoading && !hasError && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Selected Week */}
           <WeekTasksCard
             weekNumber={week}
-            tasks={tasksByWeek[week] || []}
+            tasks={currentWeekTasks}
             onTaskComplete={handleTaskCompletion}
             isCurrentWeek={
               week === currentSystemWeek && year === currentSystemYear
             }
+            selectedYear={year}
           />
 
           {/* Next Week */}
           <WeekTasksCard
             weekNumber={nextWeek}
-            tasks={tasksByWeek[nextWeek] || []}
+            tasks={nextWeekTasks}
             onTaskComplete={handleTaskCompletion}
             isCurrentWeek={
               nextWeek === currentSystemWeek &&
               nextWeekYear === currentSystemYear
             }
+            selectedYear={nextWeekYear}
           />
 
           {/* Week after next */}
           <WeekTasksCard
             weekNumber={followingWeek}
-            tasks={tasksByWeek[followingWeek] || []}
+            tasks={followingWeekTasks}
             onTaskComplete={handleTaskCompletion}
             isCurrentWeek={
               followingWeek === currentSystemWeek &&
-              (followingWeek === 1 ? nextWeekYear + 1 : nextWeekYear) ===
-                currentSystemYear
+              followingWeekYear === currentSystemYear
             }
+            selectedYear={followingWeekYear}
           />
         </div>
       )}
