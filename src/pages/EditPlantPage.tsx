@@ -8,6 +8,7 @@ import {
 } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { useState } from "react";
+import { PlantTasks } from "../components/plants/PlantTasks";
 
 export const EditPlantPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -134,6 +135,14 @@ export const EditPlantPage = () => {
             </div>
           )}
         </div>
+      </Card>
+
+      {/* Plant Tasks section */}
+      <Card className="mt-6">
+        <PlantTasks
+          plantId={plant.id}
+          plantName={plant.name_nl || plant.name}
+        />
       </Card>
     </div>
   );
