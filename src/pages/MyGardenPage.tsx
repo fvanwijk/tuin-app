@@ -38,7 +38,6 @@ export const MyGardenPage = () => {
   };
 
   const plantsByType = groupPlantsByType();
-  console.log(plantsByType);
 
   return (
     <div className="container p-4">
@@ -107,7 +106,7 @@ export const MyGardenPage = () => {
                     {plantsOfType.map((plant) => (
                       <li key={plant.id}>
                         <Link
-                          to={`/plants/${plant.id}/edit`}
+                          to={`/plants/${plant.id}`}
                           className="block hover:bg-gray-50"
                         >
                           <div className="px-4 py-4 sm:px-6">

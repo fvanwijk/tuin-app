@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { PlantForm, PlantFormData } from "../components/plants/PlantForm";
 import { Card } from "../components/ui/Card";
 import {
@@ -8,7 +8,6 @@ import {
 } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { useState } from "react";
-import { PlantTasks } from "../components/plants/PlantTasks";
 
 export const EditPlantPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +27,7 @@ export const EditPlantPage = () => {
       { ...data, id },
       {
         onSuccess: () => {
-          navigate("/my-garden");
+          navigate(`/plants/${id}`);
         },
       }
     );
@@ -71,12 +70,17 @@ export const EditPlantPage = () => {
     <div className="container p-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Plant bewerken</h1>
-        <button
-          onClick={() => navigate("/my-garden")}
-          className="text-green-600 hover:text-green-800"
-        >
-          Terug naar Mijn Tuin
-        </button>
+        <div className="flex space-x-4">
+          <Link
+            to={`/plants/${id}`}
+            className="text-green-600 hover:text-green-800"
+          >
+            Terug naar plantdetails
+          </Link>
+          <Link to="/my-garden" className="text-green-600 hover:text-green-800">
+            Terug naar Mijn Tuin
+          </Link>
+        </div>
       </div>
 
       {updateError && (
@@ -135,14 +139,6 @@ export const EditPlantPage = () => {
             </div>
           )}
         </div>
-      </Card>
-
-      {/* Plant Tasks section */}
-      <Card className="mt-6">
-        <PlantTasks
-          plantId={plant.id}
-          plantName={plant.name_nl || plant.name}
-        />
       </Card>
     </div>
   );

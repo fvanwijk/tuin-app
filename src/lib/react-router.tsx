@@ -8,6 +8,7 @@ import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { AddPlantPage } from "../pages/AddPlantPage";
 import { EditPlantPage } from "../pages/EditPlantPage";
+import { PlantDetailPage } from "../pages/PlantDetailPage";
 import { Layout } from "../components/Layout";
 import { protectedLoader, publicLoader } from "./auth";
 
@@ -71,6 +72,11 @@ export const createRouter = () =>
         {
           path: "plants/add",
           element: <AddPlantPage />,
+          loader: protectedLoader,
+        },
+        {
+          path: "plants/:id",
+          element: <PlantDetailPage />,
           loader: protectedLoader,
         },
         {
