@@ -2,9 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchTasksByPlantId,
-  fetchAllTasks,
   fetchTasksByWeek,
-  fetchTasksForWeeks,
   addTask,
   updateTask,
   deleteTask,
@@ -25,18 +23,6 @@ export const usePlantTasksQuery = (plantId?: string) => {
       return data;
     },
     enabled: !!plantId,
-  });
-};
-
-// Query hook for fetching all tasks
-export const useAllTasksQuery = () => {
-  return useQuery({
-    queryKey: ["all-tasks"],
-    queryFn: async () => {
-      const { data, error } = await fetchAllTasks();
-      if (error) throw error;
-      return data;
-    },
   });
 };
 

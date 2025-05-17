@@ -18,7 +18,6 @@ export const WeekTasksCard = ({
   tasks,
   onTaskComplete,
   isCurrentWeek,
-  selectedYear,
 }: WeekTasksCardProps) => {
   return (
     <Card className={`${isCurrentWeek ? "border-2 border-green-500" : ""}`}>

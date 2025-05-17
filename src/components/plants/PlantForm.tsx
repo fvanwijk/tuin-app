@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import type { PlantBorder } from "../../api/fetchPlants";
-import { useBorders } from "../../hooks/usePlants";
+import { useBordersQuery } from "../../hooks/useBorders";
 import Select from "react-select";
 
 export interface PlantFormData {
@@ -38,7 +38,6 @@ const COMMON_COLORS = [
   "mixed",
 ];
 
-// Plant types
 const PLANT_TYPES = [
   { value: "heester", label: "Heester" },
   { value: "klimmer", label: "Klimmer" },
@@ -47,7 +46,6 @@ const PLANT_TYPES = [
   { value: "eenjarige", label: "Eenjarige" },
 ];
 
-// Option type for react-select
 interface SelectOption {
   value: string;
   label: string;
@@ -84,7 +82,7 @@ export const PlantForm = ({
   const [comments, setComments] = useState(initialValues.comments || "");
   const [alive, setAlive] = useState(initialValues.alive !== false);
 
-  const { data: borders = [], isLoading: isBordersLoading } = useBorders();
+  const { data: borders = [], isLoading: isBordersLoading } = useBordersQuery();
 
   // Convert initialValues.borders to format for react-select
   const initialSelectedBorders = initialValues.borders

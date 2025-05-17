@@ -5,7 +5,6 @@ import {
   deletePlant,
   fetchPlantById,
   fetchPlants,
-  fetchBorders,
 } from "../api/fetchPlants";
 import { PlantFormData } from "../components/plants/PlantForm";
 
@@ -69,18 +68,6 @@ export const useDeletePlantMutation = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ["plants"] });
       queryClient.invalidateQueries({ queryKey: ["plant", id] });
-    },
-  });
-};
-
-// Hook for fetching all available borders
-export const useBorders = () => {
-  return useQuery({
-    queryKey: ["borders"],
-    queryFn: async () => {
-      const { data, error } = await fetchBorders();
-      if (error) throw error;
-      return data;
     },
   });
 };

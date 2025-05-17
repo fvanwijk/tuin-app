@@ -1,5 +1,4 @@
 import { supabase } from "../lib/supabase/client";
-import type { Tables } from "../lib/supabase/database.types";
 
 export type BorderData = {
   id?: string;

@@ -120,57 +120,6 @@ export async function fetchTasksByWeek(
   return { data: tasksWithCompletionStatus, error: null };
 }
 
-// Fetch tasks for multiple weeks
-export async function fetchTasksForWeeks(
-  startWeek: number,
-  endWeek: number,
-  year: number = getCurrentYear()
-) {
-  const { data: tasks, error } = await supabase
-    .from("plant_tasks")
-    .select(
-      `
-      *,
-      plants (
-        id,
-        name,
-        name_nl
-      )
-    `
-    )
-    .gte("week_number", startWeek)
-    .lte("week_number", endWeek)
-    .order("week_number", { ascending: true })
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  // Get completed tasks for the specified year
-  const { data: completedTasks } = await supabase
-    .from("completed_tasks")
-    .select()
-    .eq("year", year)
-    .in(
-      "task_id",
-      tasks.map((task) => task.id)
-    );
-
-  // Mark tasks that are completed for the specified year
-  const tasksWithCompletionStatus = tasks.map((task) => {
-    const isCompleted = completedTasks?.some(
-      (completed) => completed.task_id === task.id
-    );
-    return {
-      ...task,
-      isCompletedThisYear: !!isCompleted,
-    };
-  });
-
-  return { data: tasksWithCompletionStatus, error: null };
-}
-
 // Get task by ID
 export async function fetchTaskById(id: string) {
   return await supabase

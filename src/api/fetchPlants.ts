@@ -2,10 +2,6 @@ import { PlantFormData } from "../components/plants/PlantForm";
 import { supabase } from "../lib/supabase/client";
 import type { Tables } from "../lib/supabase/database.types";
 
-export async function fetchBorders() {
-  return await supabase.from("borders").select();
-}
-
 export async function fetchPlants() {
   // Fetch plants with their borders in a single query
   const { data, error } = await supabase
