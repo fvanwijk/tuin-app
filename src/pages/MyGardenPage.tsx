@@ -2,14 +2,7 @@ import { Link } from "react-router-dom";
 import { usePlantsQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-
-const PLANT_TYPE_LABELS: Record<string, string> = {
-  heester: "Heester",
-  klimmer: "Klimmer",
-  vaste_plant: "Vaste plant",
-  tweejarige: "Tweejarige",
-  eenjarige: "Eenjarige",
-};
+import { getPlantTypeLabel } from "../components/plants/utils";
 
 export const MyGardenPage = () => {
   const { data: plants, isLoading, error } = usePlantsQuery();
@@ -17,11 +10,6 @@ export const MyGardenPage = () => {
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
     return colorString.split(",").map((color) => color.trim());
-  };
-
-  const getPlantTypeLabel = (type: string | null): string => {
-    if (!type) return "Overig";
-    return PLANT_TYPE_LABELS[type] || type;
   };
 
   const groupPlantsByType = () => {
