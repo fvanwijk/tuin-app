@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "../pages/HomePage";
 import { CalendarPage } from "../pages/CalendarPage";
-import { MyGardenPage } from "../pages/MyGardenPage";
+import { PlantsPage } from "../pages/PlantsPage";
 import { BordersPage } from "../pages/BordersPage";
 import { AccountPage } from "../pages/AccountPage";
 import { LoginPage } from "../pages/LoginPage";
@@ -45,8 +45,8 @@ export const createRouter = () =>
           loader: protectedLoader,
         },
         {
-          path: "my-garden",
-          element: <MyGardenPage />,
+          path: "plants",
+          element: <PlantsPage />,
           loader: protectedLoader,
         },
         {

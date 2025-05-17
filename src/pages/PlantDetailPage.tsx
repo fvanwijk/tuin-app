@@ -44,7 +44,7 @@ export const PlantDetailPage = () => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Deze plant kon niet worden gevonden.
         </div>
-        <Button onClick={() => navigate("/my-garden")}>
+        <Button onClick={() => navigate("/plants")}>
           Terug naar Mijn Tuin
         </Button>
       </div>
@@ -56,7 +56,7 @@ export const PlantDetailPage = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{plant.name_nl || plant.name}</h1>
         <button
-          onClick={() => navigate("/my-garden")}
+          onClick={() => navigate("/plants")}
           className="text-green-600 hover:text-green-800"
         >
           Terug naar Mijn Tuin

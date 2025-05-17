@@ -125,7 +125,7 @@ export const HomePage = () => {
 
                 <div className="mt-4 text-center">
                   <a
-                    href="/my-garden"
+                    href="/plants"
                     className="text-green-600 hover:text-green-700 text-sm font-medium"
                   >
                     Bekijk alle planten

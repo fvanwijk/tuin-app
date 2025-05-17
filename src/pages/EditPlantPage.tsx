@@ -37,7 +37,7 @@ export const EditPlantPage = () => {
     if (id) {
       deletePlant(id, {
         onSuccess: () => {
-          navigate("/my-garden");
+          navigate("/plants");
         },
       });
     }
@@ -59,7 +59,7 @@ export const EditPlantPage = () => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Deze plant kon niet worden gevonden.
         </div>
-        <Button onClick={() => navigate("/my-garden")}>
+        <Button onClick={() => navigate("/plants")}>
           Terug naar Mijn Tuin
         </Button>
       </div>
@@ -77,7 +77,7 @@ export const EditPlantPage = () => {
           >
             Terug naar plantdetails
           </Link>
-          <Link to="/my-garden" className="text-green-600 hover:text-green-800">
+          <Link to="/plants" className="text-green-600 hover:text-green-800">
             Terug naar Mijn Tuin
           </Link>
         </div>

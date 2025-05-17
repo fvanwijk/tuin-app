@@ -14,7 +14,7 @@ export const AddPlantPage = () => {
   const handleSubmit = (data: PlantFormData) => {
     addPlant(data, {
       onSuccess: () => {
-        navigate("/my-garden");
+        navigate("/plants");
       },
     });
   };
@@ -24,7 +24,7 @@ export const AddPlantPage = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Plant toevoegen</h1>
         <button
-          onClick={() => navigate("/my-garden")}
+          onClick={() => navigate("/plants")}
           className="text-green-600 hover:text-green-800"
         >
           Terug naar Mijn Tuin

@@ -4,7 +4,7 @@ import { Button } from "../components/ui/Button";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { getPlantTypeLabel } from "../components/plants/utils";
 
-export const MyGardenPage = () => {
+export const PlantsPage = () => {
   const { data: plants, isLoading, error } = usePlantsQuery();
 
   const getColors = (colorString: string | null): string[] => {
