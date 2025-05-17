@@ -1,5 +1,5 @@
 import { redirect } from "react-router-dom";
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { supabase } from "./supabase/client";
 import { queryClient } from "./react-query";
 import { User } from "@supabase/supabase-js";
@@ -27,6 +27,8 @@ const authQueryOptions = queryOptions({
   queryFn: getUserAuth,
   staleTime: 30000, // 30 seconds
 });
+
+export const useAuth = () => useQuery(authQueryOptions);
 
 export async function checkAuth(): Promise<AuthLoaderData> {
   try {

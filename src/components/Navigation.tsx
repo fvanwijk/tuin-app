@@ -21,7 +21,8 @@ export const Navigation = ({
   const menuItems = [
     { path: "/", label: "Home" },
     { path: "/calendar", label: "Tuinkalender" },
-    { path: "/plants", label: "Mijn tuin" },
+    { path: "/garden", label: "Mijn tuin" },
+    { path: "/plants", label: "Planten" },
   ];
 
   const toggleMenu = () => {
