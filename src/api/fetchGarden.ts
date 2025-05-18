@@ -1,12 +1,15 @@
 import { supabase } from "../lib/supabase/client";
 
 export interface Garden {
-  id: string;
-  width: number;
-  height: number;
-  floorplan_path: string | null;
-  user_id: string;
   created_at: string;
+  floorplan_path: string | null;
+  height: number;
+  id: string;
+  position_x: number;
+  position_y: number;
+  scale: number;
+  user_id: string;
+  width: number;
 }
 
 export async function fetchGarden() {
