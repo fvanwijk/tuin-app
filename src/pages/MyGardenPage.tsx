@@ -4,13 +4,12 @@ import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3-selection";
-import { axisTop, axisLeft } from "d3-axis";
-import { scaleLinear } from "d3-scale";
 import {
   ReactZoomPanPinchContentRef,
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch";
+import { useGardenAxes } from "../hooks/useGardenAxes";
 
 export const MyGardenPage = () => {
   const { garden, isLoading, isError, updateGarden } = useGarden();
@@ -45,41 +44,14 @@ export const MyGardenPage = () => {
     }
   });
 
-  // Create and update axes when garden data or container width changes
-  useEffect(() => {
-    if (
-      !garden ||
-      !horizontalAxisRef.current ||
-      !verticalAxisRef.current ||
-      !containerWidth
-    )
-      return;
-
-    const imageWidth = containerWidth - margin.left - margin.right;
-    const imageHeight = imageWidth * (garden.height / garden.width);
-
-    d3.select(horizontalAxisRef.current).selectAll("*").remove();
-    d3.select(verticalAxisRef.current).selectAll("*").remove();
-
-    const xScale = scaleLinear()
-      .domain([0, garden.width])
-      .range([0, imageWidth]);
-
-    const yScale = scaleLinear()
-      .domain([0, garden.height])
-      .range([0, imageHeight]);
-
-    const xAxis = axisTop(xScale)
-      .ticks(5)
-      .tickFormat((d) => `${d}m`);
-
-    const yAxis = axisLeft(yScale)
-      .ticks(5)
-      .tickFormat((d) => `${d}m`);
-
-    d3.select(horizontalAxisRef.current).call(xAxis);
-    d3.select(verticalAxisRef.current).call(yAxis);
-  });
+  // Use the extracted hook for drawing axes
+  useGardenAxes(
+    garden,
+    horizontalAxisRef,
+    verticalAxisRef,
+    containerWidth,
+    margin
+  );
 
   // Toggle edit mode
   const toggleEditMode = () => {
@@ -99,22 +71,6 @@ export const MyGardenPage = () => {
     }
     setIsEditMode(!isEditMode);
   };
-
-  // Initialize transform with saved values when entering edit mode
-  useEffect(() => {
-    if (isEditMode && transformRef.current && garden) {
-      const savedScale = garden.scale || 1;
-      const savedPositionX = garden.position_x || 0;
-      const savedPositionY = garden.position_y || 0;
-
-      // Apply the saved transformations
-      transformRef.current.setTransform(
-        savedPositionX,
-        savedPositionY,
-        savedScale
-      );
-    }
-  }, [isEditMode, garden]);
 
   if (isLoading) {
     return <div className="text-center py-8">Loading garden data...</div>;
