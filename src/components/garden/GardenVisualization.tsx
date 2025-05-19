@@ -4,17 +4,19 @@ import { useGardenAxes } from "../../hooks/useGardenAxes";
 import { GardenEditor } from "./GardenEditor";
 import type { ReactZoomPanPinchContentRef } from "react-zoom-pan-pinch";
 
+export type GardenMode = "view" | "edit" | "draw";
+
 interface GardenVisualizationProps {
   garden: Garden;
   floorplanUrl: string;
-  isEditMode: boolean;
+  mode: GardenMode;
   transformRef: React.RefObject<ReactZoomPanPinchContentRef | null>;
 }
 
 export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
   garden,
   floorplanUrl,
-  isEditMode,
+  mode,
   transformRef,
 }) => {
   const horizontalAxisRef = useRef<SVGGElement>(null);
@@ -44,15 +46,24 @@ export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
     margin
   );
 
+  const getModeDescription = () => {
+    if (mode === "edit") {
+      return window.matchMedia("(pointer: coarse)").matches
+        ? "Gebruik twee vingers om in/uit te zoomen en te verplaatsen"
+        : "Gebruik de muis om te slepen en het muiswiel om te zoomen";
+    } else if (mode === "draw") {
+      return "Teken modus - planten toevoegen";
+    }
+    return "";
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">
         Tuinplattegrond
-        {isEditMode && (
+        {mode !== "view" && (
           <span className="ml-3 text-sm font-normal text-green-600">
-            {window.matchMedia("(pointer: coarse)").matches
-              ? "Gebruik twee vingers om in/uit te zoomen en te verplaatsen"
-              : "Gebruik de muis om te slepen en het muiswiel om te zoomen"}
+            {getModeDescription()}
           </span>
         )}
       </h2>
@@ -79,7 +90,7 @@ export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
           <GardenEditor
             garden={garden}
             floorplanUrl={floorplanUrl}
-            isEditMode={isEditMode}
+            mode={mode}
             transformRef={transformRef}
           />
         </div>
