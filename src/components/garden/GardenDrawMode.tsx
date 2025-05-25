@@ -30,6 +30,13 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     Array<{ id: string; x: number; y: number; radius: number }>
   >([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [newCirclePos, setNewCirclePos] = useState<{
+    id: string;
+    x: number;
+    y: number;
+    radius: number;
+  } | null>(null);
   const circleRefs = useRef<Map<string, Konva.Circle>>(new Map());
   const transformerRef = useRef<Konva.Transformer>(null);
 
@@ -54,7 +61,9 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   }, [gardenMapPoints]);
 
   // Check if a click occurred on empty space to deselect
-  const checkDeselect = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const checkDeselect = (
+    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>
+  ) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty && selectedId) {
       setSelectedId(null);
@@ -63,13 +72,26 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     return false; // No deselection happened
   };
 
-  const handleStageClick = async (e: Konva.KonvaEventObject<MouseEvent>) => {
+  // Calculate distance between two points
+  const getDistance = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ): number => {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  };
+
+  // Handle stage mouse down - start drawing a new circle
+  const handleStageMouseDown = (
+    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>
+  ) => {
     // If we deselected something, don't add a new circle
     if (checkDeselect(e)) {
       return;
     }
 
-    // Only add a circle if nothing is selected and we didn't click on an existing object
+    // Only start drawing if nothing is selected and we didn't click on an existing object
     if (!selectedId && !e.target.attrs.id) {
       // Get click position relative to the stage
       const stage = e.target.getStage();
@@ -77,26 +99,95 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
 
       if (!pointerPosition) return;
 
-      // Convert pixel position to meters
-      const xInMeters = meterToPixelScale.invert(pointerPosition.x);
-      const yInMeters = meterToPixelScale.invert(pointerPosition.y);
+      setIsDrawing(true);
 
-      // Generate a new temporary ID for the circle
-      const tempId = crypto.randomUUID();
+      const newCircle = {
+        id: crypto.randomUUID(),
+        x: meterToPixelScale.invert(pointerPosition.x),
+        y: meterToPixelScale.invert(pointerPosition.y),
+        radius: 0.1,
+      };
 
+      // Set the new circle position for tracking during mouse move
+      setNewCirclePos(newCircle);
+
+      // Add circle to state
+      setCircles([...circles, newCircle]);
+    }
+  };
+
+  // Handle stage mouse move - update circle radius while drawing
+  const handleStageMouseMove = (
+    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>
+  ) => {
+    if (!isDrawing || !newCirclePos) return;
+
+    const stage = e.target.getStage();
+    const pointerPosition = stage?.getPointerPosition();
+
+    if (!pointerPosition) return;
+
+    // Calculate the distance from the center point to current mouse position
+    const centerX = meterToPixelScale(newCirclePos.x);
+    const centerY = meterToPixelScale(newCirclePos.y);
+
+    // Calculate radius in pixels then convert to meters
+    const radiusInPixels = getDistance(
+      centerX,
+      centerY,
+      pointerPosition.x,
+      pointerPosition.y
+    );
+
+    const radiusInMeters =
+      meterToPixelScale.invert(radiusInPixels) - meterToPixelScale.invert(0);
+
+    // Update the circle with the new radius
+    setCircles(
+      circles.map((c) => {
+        if (c.id === newCirclePos.id) {
+          return { ...c, radius: Math.max(0.1, radiusInMeters) };
+        }
+        return c;
+      })
+    );
+
+    // Update the tracking state
+    setNewCirclePos({
+      ...newCirclePos,
+      radius: Math.max(0.1, radiusInMeters),
+    });
+  };
+
+  // Handle stage mouse up - finish drawing and save the circle
+  const handleStageMouseUp = async () => {
+    // Only proceed if we were drawing a circle
+    if (isDrawing && newCirclePos) {
       try {
-        // Circle to add to database
+        // Use default radius of 0.5 meters if radius is still at the initial value (0.1)
+        // This means the user just clicked without dragging
+        const finalRadius =
+          Math.abs(newCirclePos.radius - 0.1) < 0.01
+            ? 0.5
+            : newCirclePos.radius;
+
+        // Save the circle to the database
         const newPointData: GardenMapPointInput = {
           garden_id: garden.id,
-          x: xInMeters,
-          y: yInMeters,
-          radius: 0.5,
+          x: newCirclePos.x,
+          y: newCirclePos.y,
+          radius: finalRadius,
         };
 
-        const { x, y, radius } = newPointData;
-
-        // Optimistically update UI
-        setCircles([...circles, { x, y, radius, id: tempId }]);
+        // Update circle visually with final radius
+        setCircles(
+          circles.map((c) => {
+            if (c.id === newCirclePos.id) {
+              return { ...c, radius: finalRadius };
+            }
+            return c;
+          })
+        );
 
         // Save to database
         const result = await addGardenMapPoint.mutateAsync(newPointData);
@@ -105,7 +196,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         if (result.data) {
           setCircles((prevCircles) =>
             prevCircles.map((c) =>
-              c.id === tempId ? { ...c, id: result.data!.id } : c
+              c.id === newCirclePos.id ? { ...c, id: result.data!.id } : c
             )
           );
           setSelectedId(result.data.id);
@@ -113,13 +204,19 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
       } catch (error) {
         console.error("Error saving garden map point:", error);
         // Remove the temporary circle if saving failed
-        setCircles((prevCircles) => prevCircles.filter((c) => c.id !== tempId));
+        setCircles((prevCircles) =>
+          prevCircles.filter((c) => c.id !== newCirclePos.id)
+        );
+      } finally {
+        // Reset the drawing state
+        setIsDrawing(false);
+        setNewCirclePos(null);
       }
     }
   };
 
   const handleCircleClick = (
-    e: Konva.KonvaEventObject<MouseEvent>,
+    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>,
     id: string
   ) => {
     e.cancelBubble = true; // Stop propagation to prevent stage click
@@ -127,13 +224,13 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   };
 
   const handleCircleDragEnd = async (
-    e: Konva.KonvaEventObject<DragEvent>,
+    e: Konva.KonvaEventObject<Event>,
     id: string
   ) => {
     // Get the new position
-    const circle = e.target as Konva.Circle;
-    const newX = meterToPixelScale.invert(circle.x());
-    const newY = meterToPixelScale.invert(circle.y());
+    const node = e.target as Konva.Circle;
+    const newX = meterToPixelScale.invert(node.x());
+    const newY = meterToPixelScale.invert(node.y());
 
     // Update local state
     setCircles(
@@ -276,7 +373,12 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           width={dimensions.width}
           height={dimensions.height}
           style={{ position: "absolute", top: 0, left: 0 }}
-          onClick={handleStageClick}
+          onMouseDown={handleStageMouseDown}
+          onMouseMove={handleStageMouseMove}
+          onMouseUp={handleStageMouseUp}
+          onTouchStart={handleStageMouseDown}
+          onTouchMove={handleStageMouseMove}
+          onTouchEnd={handleStageMouseUp}
         >
           <Layer>
             {circles.map((circle, i) => (
@@ -292,6 +394,14 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
                 strokeWidth={2}
                 draggable
                 onClick={(e) => handleCircleClick(e, circle.id)}
+                onTap={(e) =>
+                  handleCircleClick(
+                    e as unknown as Konva.KonvaEventObject<
+                      MouseEvent | TouchEvent
+                    >,
+                    circle.id
+                  )
+                }
                 onDragEnd={(e) => handleCircleDragEnd(e, circle.id)}
                 onTransformEnd={(e) => handleTransformEnd(e, circle.id)}
                 ref={(node) => {
