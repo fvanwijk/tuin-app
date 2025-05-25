@@ -10,6 +10,7 @@ import {
 } from "../../hooks/useGardenMapPoints";
 import { GardenMapPointInput } from "../../api/fetchGardenMapPoints";
 import { useGardenDimensions } from "../../hooks/useGardenDimensions";
+import { MapPointForm } from "./MapPointForm";
 
 interface GardenDrawModeProps {
   floorplanUrl: string;
@@ -349,6 +350,27 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     }
   }, [selectedId]);
 
+  // Effect to update circle visuals when map points data changes
+  // This ensures the circles stay in sync with form changes
+  useEffect(() => {
+    if (gardenMapPoints && gardenMapPoints.length > 0) {
+      // Update circle positions, radius and keep ids consistent
+      setCircles(
+        gardenMapPoints.map((point) => ({
+          id: point.id,
+          x: point.x,
+          y: point.y,
+          radius: point.radius,
+        }))
+      );
+    }
+  }, [gardenMapPoints]);
+
+  // Find the selected map point data from gardenMapPoints
+  const selectedMapPoint = selectedId
+    ? gardenMapPoints?.find((point) => point.id === selectedId)
+    : null;
+
   return (
     <div className="border overflow-hidden relative" ref={containerRef}>
       <img
@@ -389,7 +411,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
                 x={meterToPixelScale(circle.x)}
                 y={meterToPixelScale(circle.y)}
                 radius={meterToPixelScale(circle.radius)}
-                fill="rgba(0, 150, 136, 0.5)"
+                fill={isDrawing && newCirclePos?.id === circle.id ? "transparent" : "rgba(0, 150, 136, 0.5)"}
                 stroke={"rgba(0, 150, 136, 1)"}
                 strokeWidth={2}
                 draggable
@@ -430,6 +452,9 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           </Layer>
         </Stage>
       )}
+
+      {/* Display the MapPointForm when a circle is selected */}
+      {selectedMapPoint && <MapPointForm selectedPoint={selectedMapPoint} />}
     </div>
   );
 };
