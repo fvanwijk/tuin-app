@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Garden } from "../../api/fetchGarden";
+import { Stage } from "react-konva";
 
 interface GardenDrawModeProps {
   floorplanUrl: string;
@@ -12,8 +13,27 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   garden,
   aspectRatio,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  const updateDimensions = () => {
+    if (containerRef.current) {
+      const { width, height } = containerRef.current.getBoundingClientRect();
+      setDimensions({ width, height });
+    }
+  };
+
+  useEffect(() => {
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+    };
+  }, []);
+
   return (
-    <div className="border overflow-hidden relative">
+    <div className="border overflow-hidden relative" ref={containerRef}>
       <img
         src={floorplanUrl}
         alt="Tuinplattegrond"
@@ -27,11 +47,11 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           cursor: "crosshair",
         }}
       />
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="bg-white bg-opacity-70 px-4 py-2 rounded-lg shadow">
-          <p>Draw mode - Functionality coming soon</p>
-        </div>
-      </div>
+      <Stage
+        width={dimensions.width}
+        height={dimensions.height}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      />
     </div>
   );
 };
