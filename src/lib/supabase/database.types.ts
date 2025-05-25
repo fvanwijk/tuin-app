@@ -108,6 +108,64 @@ export type Database = {
         }
         Relationships: []
       }
+      garden_map_points: {
+        Row: {
+          border_id: string | null
+          created_at: string
+          garden_id: string
+          id: string
+          plant_id: string | null
+          radius: number
+          user_id: string | null
+          x: number
+          y: number
+        }
+        Insert: {
+          border_id?: string | null
+          created_at?: string
+          garden_id: string
+          id?: string
+          plant_id?: string | null
+          radius?: number
+          user_id?: string | null
+          x: number
+          y: number
+        }
+        Update: {
+          border_id?: string | null
+          created_at?: string
+          garden_id?: string
+          id?: string
+          plant_id?: string | null
+          radius?: number
+          user_id?: string | null
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "garden_map_points_border_id_fkey"
+            columns: ["border_id"]
+            isOneToOne: false
+            referencedRelation: "borders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "garden_map_points_garden_id_fkey"
+            columns: ["garden_id"]
+            isOneToOne: false
+            referencedRelation: "garden"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "garden_map_points_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plant_tasks: {
         Row: {
           created_at: string
