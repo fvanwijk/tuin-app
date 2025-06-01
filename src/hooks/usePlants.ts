@@ -7,13 +7,14 @@ import {
   fetchPlants,
 } from "../api/fetchPlants";
 import { PlantFormData } from "../components/plants/PlantForm";
+import { colorMap } from "../components/garden/colors";
 
 // Query hook for fetching all plants with their borders
-export const usePlantsQuery = () => {
+export const usePlantsQuery = (searchQuery?: string) => {
   return useQuery({
-    queryKey: ["plants"],
+    queryKey: ["plants", searchQuery],
     queryFn: async () => {
-      const { data, error } = await fetchPlants();
+      const { data, error } = await fetchPlants(searchQuery);
       if (error) throw error;
       return data;
     },

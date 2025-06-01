@@ -2,18 +2,24 @@ import { PlantFormData } from "../components/plants/PlantForm";
 import { supabase } from "../lib/supabase/client";
 import type { Tables } from "../lib/supabase/database.types";
 
-export async function fetchPlants() {
-  // Fetch plants with their borders in a single query
-  const { data, error } = await supabase
-    .from("plants")
-    .select(
-      `
+export async function fetchPlants(searchQuery?: string) {
+  // Start building the query
+  let query = supabase.from("plants").select(
+    `
       *,
       borders(id, name)
     `
-    )
-    .order("name_nl");
+  );
 
+  if (searchQuery?.trim()) {
+    const search = searchQuery.toLowerCase().trim();
+    query = query.or(`name_nl.ilike.%${search}%,name.ilike.%${search}%`);
+    //query = query.or(`name_nl.eq.${search},name.eq.${search}`);
+    //query = query.eq("name_nl", search);
+  }
+  const { data, error } = await query.order("name_nl");
+
+  console.log(data);
   if (error) {
     throw error;
   }

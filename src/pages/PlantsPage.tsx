@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { usePlantsQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { getPlantTypeLabel } from "../components/plants/utils";
 import { colorMap } from "../components/garden/colors";
+import { useState } from "react";
 
 export const PlantsPage = () => {
-  const { data: plants, isLoading, error } = usePlantsQuery();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: plants, isLoading, error } = usePlantsQuery(searchQuery);
 
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
@@ -42,6 +45,16 @@ export const PlantsPage = () => {
         </div>
       </div>
 
+      <div className="mb-6">
+        <Input
+          type="text"
+          placeholder="Zoeken op naam, latijnse naam, kleur of border..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-md"
+        />
+      </div>
+
       {isLoading && (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-600">Planten laden...</p>
@@ -54,10 +67,19 @@ export const PlantsPage = () => {
         </div>
       )}
 
-      {plants && plants.length === 0 && (
+      {plants?.length === 0 && !searchQuery && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-8 rounded mb-4 text-center">
           <p className="mb-2 text-lg">Je hebt nog geen planten toegevoegd.</p>
           <p>Klik op 'Plant toevoegen' om je eerste plant toe te voegen.</p>
+        </div>
+      )}
+
+      {plants?.length === 0 && searchQuery && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-8 rounded mb-4 text-center">
+          <p className="mb-2 text-lg">
+            Geen resultaten gevonden voor "{searchQuery}"
+          </p>
+          <p>Probeer een andere zoekterm</p>
         </div>
       )}
 
