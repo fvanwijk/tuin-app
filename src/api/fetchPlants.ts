@@ -14,8 +14,6 @@ export async function fetchPlants(searchQuery?: string) {
   if (searchQuery?.trim()) {
     const search = searchQuery.toLowerCase().trim();
     query = query.or(`name_nl.ilike.%${search}%,name.ilike.%${search}%`);
-    //query = query.or(`name_nl.eq.${search},name.eq.${search}`);
-    //query = query.eq("name_nl", search);
   }
   const { data, error } = await query.order("name_nl");
 

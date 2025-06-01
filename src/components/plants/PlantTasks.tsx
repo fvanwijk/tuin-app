@@ -7,6 +7,7 @@ import {
   useDeleteTaskMutation,
 } from "../../hooks/usePlantTasks";
 import { Button } from "../ui/Button";
+import { Tag } from "../ui/Tag";
 import {
   PlantTask,
   PlantTaskData,
@@ -108,10 +109,20 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
                           : "text-gray-500"
                       } mt-1`}
                     >
-                      <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                      <Tag
+                        variant={
+                          task.week_number === currentWeek ? "success" : "gray"
+                        }
+                        size="md"
+                        className={
+                          task.week_number === currentWeek
+                            ? "ring-1 ring-inset ring-green-700/10"
+                            : "ring-1 ring-inset ring-gray-400/10"
+                        }
+                      >
                         Week {task.week_number}
                         {task.week_number === currentWeek && " (huidige week)"}
-                      </span>
+                      </Tag>
                     </div>
                   )}
                 </div>

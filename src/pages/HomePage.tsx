@@ -1,5 +1,6 @@
 import { WeekTasksCard } from "../components/calendar/WeekTaskCard";
 import { Card } from "../components/ui/Card";
+import { Tag } from "../components/ui/Tag";
 import {
   useCurrentWeekTasksQuery,
   useCompleteTaskMutation,
@@ -102,9 +103,9 @@ export const HomePage = () => {
                   <span className="text-lg font-medium">
                     Totaal aantal planten
                   </span>
-                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+                  <Tag variant="success" size="md">
                     {plants.length}
-                  </span>
+                  </Tag>
                 </div>
 
                 <h3 className="text-md font-medium mb-3">Aantal per type</h3>
@@ -115,9 +116,9 @@ export const HomePage = () => {
                         <span className="font-medium">
                           {getPlantTypeLabel(type)}
                         </span>
-                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
+                        <Tag variant="success" size="sm">
                           {count}
-                        </span>
+                        </Tag>
                       </div>
                     </li>
                   ))}

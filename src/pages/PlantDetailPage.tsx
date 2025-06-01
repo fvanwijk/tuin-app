@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { usePlantByIdQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
+import { Tag } from "../components/ui/Tag";
 import { PlantTasks } from "../components/plants/PlantTasks";
 import { colorMap } from "../components/garden/colors";
 
@@ -125,12 +126,9 @@ export const PlantDetailPage = () => {
             {plant.borders && plant.borders.length > 0 ? (
               <div className="flex flex-wrap gap-2 mb-4">
                 {plant.borders.map((border) => (
-                  <span
-                    key={border.id}
-                    className="px-3 py-1 rounded-full bg-green-100 text-green-800"
-                  >
+                  <Tag key={border.id} variant="success" size="md">
                     {border.name}
-                  </span>
+                  </Tag>
                 ))}
               </div>
             ) : (

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { usePlantsQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
+import { Tag } from "../components/ui/Tag";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import {
   getPlantTypeLabel,
@@ -97,15 +98,13 @@ export const PlantsPage = () => {
               >
                 <div className="flex items-center justify-center">
                   <span>{getPlantTypeLabel(type)}</span>
-                  <span
-                    className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                      plantsByType[type].length > 0
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-200 text-gray-700"
-                    }`}
+                  <Tag
+                    variant={plantsByType[type].length > 0 ? "success" : "gray"}
+                    size="sm"
+                    count
                   >
                     {plantsByType[type].length}
-                  </span>
+                  </Tag>
                 </div>
               </Tab>
             ))}
@@ -161,12 +160,13 @@ export const PlantsPage = () => {
                                         name: string;
                                         id: string;
                                       }) => (
-                                        <span
+                                        <Tag
                                           key={`${plant.id}-border-${border.id}`}
-                                          className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                                          variant="success"
+                                          size="md"
                                         >
                                           {border.name}
-                                        </span>
+                                        </Tag>
                                       )
                                     )}
                                 </div>
