@@ -19,7 +19,6 @@ export async function fetchPlants(searchQuery?: string) {
   }
   const { data, error } = await query.order("name_nl");
 
-  console.log(data);
   if (error) {
     throw error;
   }

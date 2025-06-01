@@ -7,7 +7,6 @@ import {
   fetchPlants,
 } from "../api/fetchPlants";
 import { PlantFormData } from "../components/plants/PlantForm";
-import { colorMap } from "../components/garden/colors";
 
 // Query hook for fetching all plants with their borders
 export const usePlantsQuery = (searchQuery?: string) => {

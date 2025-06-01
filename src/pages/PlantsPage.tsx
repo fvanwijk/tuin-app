@@ -3,33 +3,22 @@ import { usePlantsQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { getPlantTypeLabel } from "../components/plants/utils";
+import {
+  getPlantTypeLabel,
+  groupPlantsByType,
+} from "../components/plants/utils";
 import { colorMap } from "../components/garden/colors";
 import { useState } from "react";
 
 export const PlantsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: plants, isLoading, error } = usePlantsQuery(searchQuery);
-
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
     return colorString.split(",").map((color) => color.trim());
   };
 
-  const groupPlantsByType = () => {
-    if (!plants) return {};
-
-    return plants.reduce((groups: Record<string, typeof plants>, plant) => {
-      const type = plant.type || "Overig";
-      if (!groups[type]) {
-        groups[type] = [];
-      }
-      groups[type].push(plant);
-      return groups;
-    }, {});
-  };
-
-  const plantsByType = groupPlantsByType();
+  const plantsByType = groupPlantsByType(plants);
 
   return (
     <div className="container p-4">
@@ -45,7 +34,7 @@ export const PlantsPage = () => {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-3">
         <Input
           type="text"
           placeholder="Zoeken op naam, latijnse naam, kleur of border..."
@@ -54,6 +43,23 @@ export const PlantsPage = () => {
           className="max-w-md"
         />
       </div>
+
+      {/* Display total number of filtered plants */}
+      {plants && !isLoading && (
+        <div className="mb-6">
+          <p
+            className={`text-sm ${
+              searchQuery ? "font-medium" : "text-gray-600"
+            }`}
+          >
+            {plants.length === 0
+              ? "Geen planten gevonden"
+              : `${plants.length} ${
+                  plants.length === 1 ? "plant" : "planten"
+                } gevonden${searchQuery ? ` voor "${searchQuery}"` : ""}`}
+          </p>
+        </div>
+      )}
 
       {isLoading && (
         <div className="flex justify-center items-center h-64">
@@ -74,45 +80,60 @@ export const PlantsPage = () => {
         </div>
       )}
 
-      {plants?.length === 0 && searchQuery && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-8 rounded mb-4 text-center">
-          <p className="mb-2 text-lg">
-            Geen resultaten gevonden voor "{searchQuery}"
-          </p>
-          <p>Probeer een andere zoekterm</p>
-        </div>
-      )}
-
-      {plants && plants.length > 0 && (
-        <div className="space-y-6">
-          <TabGroup>
-            <TabList className="flex p-1 space-x-1 bg-gray-100 rounded-md shadow-inner mb-4">
-              {Object.keys(plantsByType).map((type) => (
-                <Tab
-                  key={type}
-                  className={({ selected }) =>
-                    `w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none ${
-                      selected
-                        ? "bg-white shadow text-green-700"
-                        : "text-gray-600 hover:bg-white/[0.25] hover:text-green-600"
-                    }`
-                  }
-                >
-                  {getPlantTypeLabel(type)}
-                </Tab>
-              ))}
-            </TabList>
-            <TabPanels>
-              {Object.entries(plantsByType).map(([type, plantsOfType]) => (
-                <TabPanel
-                  key={type}
-                  className="bg-white shadow overflow-hidden sm:rounded-md"
-                >
-                  <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                    <h2 className="text-lg font-medium text-gray-800">
-                      {getPlantTypeLabel(type)}
-                    </h2>
+      {/* Always show the tabs regardless of whether there are plants or not */}
+      <div className="space-y-6">
+        <TabGroup>
+          <TabList className="flex p-1 space-x-1 bg-gray-100 rounded-md shadow-inner mb-4">
+            {Object.keys(plantsByType).map((type) => (
+              <Tab
+                key={type}
+                className={({ selected }) =>
+                  `w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none ${
+                    selected
+                      ? "bg-white shadow text-green-700"
+                      : "text-gray-600 hover:bg-white/[0.25] hover:text-green-600"
+                  }`
+                }
+              >
+                <div className="flex items-center justify-center">
+                  <span>{getPlantTypeLabel(type)}</span>
+                  <span
+                    className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                      plantsByType[type].length > 0
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {plantsByType[type].length}
+                  </span>
+                </div>
+              </Tab>
+            ))}
+          </TabList>
+          <TabPanels>
+            {Object.entries(plantsByType).map(([type, plantsOfType]) => (
+              <TabPanel
+                key={type}
+                className="bg-white shadow overflow-hidden sm:rounded-md"
+              >
+                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                  <h2 className="text-lg font-medium text-gray-800">
+                    {getPlantTypeLabel(type)}
+                  </h2>
+                </div>
+                {plantsOfType.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <p className="text-gray-500">
+                      Geen planten van dit type gevonden.
+                    </p>
+                    <Link
+                      to="/plants/add"
+                      className="mt-3 inline-block text-green-600 hover:text-green-700 font-medium"
+                    >
+                      Plant toevoegen
+                    </Link>
                   </div>
+                ) : (
                   <ul className="divide-y divide-gray-200">
                     {plantsOfType.map((plant) => (
                       <li key={plant.id}>
@@ -134,14 +155,20 @@ export const PlantsPage = () => {
                               </div>
                               <div className="ml-2 flex-shrink-0 flex">
                                 <div className="flex flex-wrap gap-1">
-                                  {plant.borders.map(({ name, id }) => (
-                                    <span
-                                      key={`${plant.id}-border-${id}`}
-                                      className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                                    >
-                                      {name}
-                                    </span>
-                                  ))}
+                                  {plant.borders &&
+                                    plant.borders.map(
+                                      (border: {
+                                        name: string;
+                                        id: string;
+                                      }) => (
+                                        <span
+                                          key={`${plant.id}-border-${border.id}`}
+                                          className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                                        >
+                                          {border.name}
+                                        </span>
+                                      )
+                                    )}
                                 </div>
                               </div>
                             </div>
@@ -173,12 +200,12 @@ export const PlantsPage = () => {
                       </li>
                     ))}
                   </ul>
-                </TabPanel>
-              ))}
-            </TabPanels>
-          </TabGroup>
-        </div>
-      )}
+                )}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </TabGroup>
+      </div>
     </div>
   );
 };
