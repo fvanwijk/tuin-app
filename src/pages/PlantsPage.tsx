@@ -1,17 +1,47 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { colorMap } from '../components/garden/colors';
-import { getPlantTypeLabel, groupPlantsByType } from '../components/plants/utils';
+import { PLANT_TYPES, getPlantTypeLabel, groupPlantsByType } from '../components/plants/utils';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Tag } from '../components/ui/Tag';
 import { usePlantsQuery } from '../hooks/usePlants';
 
 export const PlantsPage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get query parameters or use defaults
+  const searchQuery = searchParams.get('q') || '';
+  const selectedTab = searchParams.get('type') || 'heester';
+
+  // Update search query and URL parameter
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    // Update URL with the new search query
+    const newParams = new URLSearchParams(searchParams);
+    if (newQuery) {
+      newParams.set('q', newQuery);
+    } else {
+      newParams.delete('q');
+    }
+    setSearchParams(newParams);
+  };
+
+  // Handle tab change and update URL
+  const handleTabChange = (index: number) => {
+    const tabKey = PLANT_TYPES[index];
+    // Update URL with the new tab type
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('type', tabKey);
+    setSearchParams(newParams);
+  };
+
+  // Find the selected tab index
+  const selectedTabIndex = PLANT_TYPES.indexOf(selectedTab) !== -1 ? PLANT_TYPES.indexOf(selectedTab) : 0;
+
   const { data: plants, isLoading, error } = usePlantsQuery(searchQuery);
+
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
     return colorString.split(',').map((color) => color.trim());
@@ -38,7 +68,7 @@ export const PlantsPage = () => {
           type="text"
           placeholder="Zoeken op naam, latijnse naam, kleur of border..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className="max-w-md"
         />
       </div>
@@ -77,7 +107,7 @@ export const PlantsPage = () => {
 
       {/* Always show the tabs regardless of whether there are plants or not */}
       <div className="space-y-6">
-        <TabGroup>
+        <TabGroup selectedIndex={selectedTabIndex} onChange={handleTabChange}>
           <TabList className="flex p-1 space-x-1 bg-gray-100 rounded-md shadow-inner mb-4">
             {Object.keys(plantsByType).map((type) => (
               <Tab
