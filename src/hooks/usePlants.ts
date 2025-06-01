@@ -4,11 +4,11 @@ import { addPlant, deletePlant, fetchPlantById, fetchPlants, updatePlant } from 
 import { PlantFormData } from '../components/plants/PlantForm';
 
 // Query hook for fetching all plants with their borders
-export const usePlantsQuery = (searchQuery?: string) => {
+export const usePlantsQuery = () => {
   return useQuery({
-    queryKey: ['plants', searchQuery],
+    queryKey: ['plants'],
     queryFn: async () => {
-      const { data, error } = await fetchPlants(searchQuery);
+      const { data, error } = await fetchPlants();
       if (error) throw error;
       return data;
     },

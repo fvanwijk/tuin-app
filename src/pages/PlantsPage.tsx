@@ -40,12 +40,54 @@ export const PlantsPage = () => {
   // Find the selected tab index
   const selectedTabIndex = PLANT_TYPES.indexOf(selectedTab) !== -1 ? PLANT_TYPES.indexOf(selectedTab) : 0;
 
-  const { data: plants, isLoading, error } = usePlantsQuery(searchQuery);
+  const { data: allPlants, isLoading, error } = usePlantsQuery();
 
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
     return colorString.split(',').map((color) => color.trim());
   };
+
+  // Client-side filtering function
+  const filterPlants = (plants: any[] | null | undefined) => {
+    if (!plants) return [];
+
+    return plants.filter((plant) => {
+      if (!searchQuery) return true;
+
+      const query = searchQuery.toLowerCase().trim();
+
+      // Search in plant names (Dutch and Latin)
+      if (plant.name_nl?.toLowerCase().includes(query) || plant.name?.toLowerCase().includes(query)) {
+        return true;
+      }
+
+      // Search in border names
+      if (
+        plant.borders &&
+        plant.borders.some((border: { name: string }) => border.name.toLowerCase().includes(query))
+      ) {
+        return true;
+      }
+
+      // Search in color names
+      if (plant.color) {
+        const plantColors = getColors(plant.color);
+        if (
+          plantColors.some((color) => {
+            const colorName = colorMap.get(color)?.toLowerCase();
+            return colorName && colorName.includes(query);
+          })
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  };
+
+  // Apply the filter to the plants
+  const plants = filterPlants(allPlants);
 
   const plantsByType = groupPlantsByType(plants);
 
@@ -66,10 +108,9 @@ export const PlantsPage = () => {
       <div className="mb-3">
         <Input
           type="text"
-          placeholder="Zoeken op naam, latijnse naam, kleur of border..."
+          placeholder="Zoeken op naam, latijnse naam, border of kleur (zoals 'Blauw', 'Rood')..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="max-w-md"
         />
       </div>
 
@@ -82,6 +123,7 @@ export const PlantsPage = () => {
               : `${plants.length} ${
                   plants.length === 1 ? 'plant' : 'planten'
                 } gevonden${searchQuery ? ` voor "${searchQuery}"` : ''}`}
+            {searchQuery && allPlants && plants.length !== allPlants.length ? ` (van ${allPlants.length} totaal)` : ''}
           </p>
         </div>
       )}
