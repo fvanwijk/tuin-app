@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { supabase } from "../lib/supabase/client";
-import { AuthError, AuthResponse, User } from "@supabase/supabase-js";
-import { Card } from "../components/ui/Card";
-import { Input } from "../components/ui/Input";
-import { Button } from "../components/ui/Button";
+import { AuthError, AuthResponse, User } from '@supabase/supabase-js';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, Navigate, useLocation } from 'react-router-dom';
+
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Input } from '../components/ui/Input';
+import { supabase } from '../lib/supabase/client';
 
 interface LoginFormValues {
   email: string;
@@ -18,7 +19,7 @@ export const LoginPage = () => {
   const location = useLocation();
 
   // Get the page they were trying to access
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || '/';
 
   const {
     register,
@@ -51,7 +52,7 @@ export const LoginPage = () => {
         <Card title="Login to Tuin App">
           {loginMutation.isError && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {loginMutation.error?.message || "Error logging in"}
+              {loginMutation.error?.message || 'Error logging in'}
             </div>
           )}
 
@@ -64,11 +65,11 @@ export const LoginPage = () => {
               autoComplete="email"
               error={errors.email?.message}
               disabled={loginMutation.isPending}
-              {...register("email", {
-                required: "Email is required",
+              {...register('email', {
+                required: 'Email is required',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address",
+                  message: 'Invalid email address',
                 },
               })}
             />
@@ -81,8 +82,8 @@ export const LoginPage = () => {
               autoComplete="current-password"
               error={errors.password?.message}
               disabled={loginMutation.isPending}
-              {...register("password", {
-                required: "Password is required",
+              {...register('password', {
+                required: 'Password is required',
               })}
             />
 
@@ -93,11 +94,8 @@ export const LoginPage = () => {
 
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
-              Need an account?{" "}
-              <Link
-                to="/register"
-                className="text-green-600 hover:text-green-500 font-medium"
-              >
+              Need an account?{' '}
+              <Link to="/register" className="text-green-600 hover:text-green-500 font-medium">
                 Register here
               </Link>
             </p>

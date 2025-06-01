@@ -1,24 +1,16 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { PlantForm, PlantFormData } from "../components/plants/PlantForm";
-import { Card } from "../components/ui/Card";
-import {
-  useDeletePlantMutation,
-  usePlantByIdQuery,
-  useUpdatePlantMutation,
-} from "../hooks/usePlants";
-import { Button } from "../components/ui/Button";
-import { useState } from "react";
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
+import { PlantForm, PlantFormData } from '../components/plants/PlantForm';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { useDeletePlantMutation, usePlantByIdQuery, useUpdatePlantMutation } from '../hooks/usePlants';
 
 export const EditPlantPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const {
-    mutate: updatePlant,
-    isPending: isUpdating,
-    error: updateError,
-  } = useUpdatePlantMutation();
-  const { mutate: deletePlant, isPending: isDeleting } =
-    useDeletePlantMutation();
+  const { mutate: updatePlant, isPending: isUpdating, error: updateError } = useUpdatePlantMutation();
+  const { mutate: deletePlant, isPending: isDeleting } = useDeletePlantMutation();
   const { data: plant, isLoading, error } = usePlantByIdQuery(id);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
@@ -29,7 +21,7 @@ export const EditPlantPage = () => {
         onSuccess: () => {
           navigate(`/plants/${id}`);
         },
-      }
+      },
     );
   };
 
@@ -37,7 +29,7 @@ export const EditPlantPage = () => {
     if (id) {
       deletePlant(id, {
         onSuccess: () => {
-          navigate("/plants");
+          navigate('/plants');
         },
       });
     }
@@ -59,9 +51,7 @@ export const EditPlantPage = () => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Deze plant kon niet worden gevonden.
         </div>
-        <Button onClick={() => navigate("/plants")}>
-          Terug naar Mijn Tuin
-        </Button>
+        <Button onClick={() => navigate('/plants')}>Terug naar Mijn Tuin</Button>
       </div>
     );
   }
@@ -71,10 +61,7 @@ export const EditPlantPage = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Plant bewerken</h1>
         <div className="flex space-x-4">
-          <Link
-            to={`/plants/${id}`}
-            className="text-green-600 hover:text-green-800"
-          >
+          <Link to={`/plants/${id}`} className="text-green-600 hover:text-green-800">
             Terug naar plantdetails
           </Link>
           <Link to="/plants" className="text-green-600 hover:text-green-800">
@@ -85,8 +72,7 @@ export const EditPlantPage = () => {
 
       {updateError && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          Er is een fout opgetreden bij het bijwerken van de plant. Probeer het
-          opnieuw.
+          Er is een fout opgetreden bij het bijwerken van de plant. Probeer het opnieuw.
         </div>
       )}
 
@@ -98,7 +84,7 @@ export const EditPlantPage = () => {
             color: plant.color,
             comments: plant.comments,
             id: plant.id,
-            name_nl: plant.name_nl || "",
+            name_nl: plant.name_nl || '',
             name: plant.name,
             type: plant.type,
           }}
@@ -117,14 +103,9 @@ export const EditPlantPage = () => {
             </Button>
           ) : (
             <div className="space-y-4">
-              <p className="text-red-600 font-medium">
-                Weet je zeker dat je deze plant wilt verwijderen?
-              </p>
+              <p className="text-red-600 font-medium">Weet je zeker dat je deze plant wilt verwijderen?</p>
               <div className="flex space-x-4">
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowConfirmDelete(false)}
-                >
+                <Button variant="secondary" onClick={() => setShowConfirmDelete(false)}>
                   Annuleren
                 </Button>
                 <Button

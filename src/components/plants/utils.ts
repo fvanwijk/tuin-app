@@ -1,16 +1,16 @@
 export const PLANT_TYPE_LABELS: Record<string, string> = {
-  heester: "Heester",
-  klimmer: "Klimmer",
-  vaste_plant: "Vaste plant",
-  tweejarige: "Tweejarige",
-  eenjarige: "Eenjarige",
-  overig: "Overig",
+  heester: 'Heester',
+  klimmer: 'Klimmer',
+  vaste_plant: 'Vaste plant',
+  tweejarige: 'Tweejarige',
+  eenjarige: 'Eenjarige',
+  overig: 'Overig',
 };
 
 export const PLANT_TYPES = Object.keys(PLANT_TYPE_LABELS);
 
 export const getPlantTypeLabel = (type: string | null): string => {
-  if (!type) return "Overig";
+  if (!type) return 'Overig';
   return PLANT_TYPE_LABELS[type] || type;
 };
 
@@ -22,7 +22,7 @@ export const getPlantTypeLabel = (type: string | null): string => {
  * @returns Record with plant types as keys and arrays of plants as values
  */
 export function groupPlantsByType<T extends { type?: string | null }>(
-  plants: T[] | null | undefined
+  plants: T[] | null | undefined,
 ): Record<string, T[]> {
   // Initialize all predefined plant types
   const groups = PLANT_TYPES.reduce<Record<string, T[]>>((acc, type) => {
@@ -35,7 +35,7 @@ export function groupPlantsByType<T extends { type?: string | null }>(
 
   // Fill the groups with plants
   return plants.reduce<Record<string, T[]>>((acc, plant) => {
-    const type = plant.type || "overig";
+    const type = plant.type || 'overig';
 
     // Make sure the type exists in the accumulator
     if (!acc[type]) {

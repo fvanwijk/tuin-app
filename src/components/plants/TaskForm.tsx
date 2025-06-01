@@ -1,9 +1,9 @@
-// filepath: /Users/fvanwijk/projects/tuin-app/src/components/plants/TaskForm.tsx
-import { useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Input } from "../ui/Input";
-import { Button } from "../ui/Button";
-import { PlantTaskData } from "../../api/fetchPlantTasks";
+import { useEffect } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
+import { PlantTaskData } from '../../api/fetchPlantTasks';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 interface TaskFormProps {
   initialValues?: Partial<PlantTaskData>;
@@ -20,13 +20,7 @@ type TaskFormValues = {
   week_number: number;
 };
 
-export const TaskForm = ({
-  initialValues,
-  onSubmit,
-  isSubmitting = false,
-  plantId,
-  onCancel,
-}: TaskFormProps) => {
+export const TaskForm = ({ initialValues, onSubmit, isSubmitting = false, plantId, onCancel }: TaskFormProps) => {
   const {
     register,
     handleSubmit,
@@ -34,8 +28,8 @@ export const TaskForm = ({
     reset,
   } = useForm<TaskFormValues>({
     defaultValues: initialValues && {
-      title: initialValues.title || "",
-      description: initialValues.description || "",
+      title: initialValues.title || '',
+      description: initialValues.description || '',
       week_number: initialValues.week_number,
     },
   });
@@ -44,8 +38,8 @@ export const TaskForm = ({
   useEffect(() => {
     if (initialValues) {
       reset({
-        title: initialValues.title || "",
-        description: initialValues.description || "",
+        title: initialValues.title || '',
+        description: initialValues.description || '',
         week_number: initialValues.week_number,
       });
     }
@@ -64,19 +58,16 @@ export const TaskForm = ({
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
           Titel
         </label>
         <Input
           id="title"
-          {...register("title", {
-            required: "Titel is verplicht",
+          {...register('title', {
+            required: 'Titel is verplicht',
             maxLength: {
               value: 255,
-              message: "Titel mag maximaal 255 karakters lang zijn",
+              message: 'Titel mag maximaal 255 karakters lang zijn',
             },
           })}
           placeholder="bijv. Water geven of Snoeien"
@@ -85,51 +76,39 @@ export const TaskForm = ({
       </div>
 
       <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
           Beschrijving
         </label>
         <textarea
           id="description"
-          {...register("description")}
+          {...register('description')}
           className={`mt-1 block w-full rounded-md ${
             errors.description
-              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-              : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+              ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+              : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
           } shadow-sm`}
           rows={2}
           placeholder="Optionele beschrijving"
         />
-        {errors.description && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.description.message}
-          </p>
-        )}
+        {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}
       </div>
 
       <div>
-        <label
-          htmlFor="week_number"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="week_number" className="block text-sm font-medium text-gray-700">
           Weeknummer (1-52)
         </label>
         <Input
           id="week_number"
           type="number"
-          {...register("week_number", {
-            min: { value: 1, message: "Weeknummer moet minimaal 1 zijn" },
-            max: { value: 52, message: "Weeknummer mag maximaal 52 zijn" },
+          {...register('week_number', {
+            min: { value: 1, message: 'Weeknummer moet minimaal 1 zijn' },
+            max: { value: 52, message: 'Weeknummer mag maximaal 52 zijn' },
             valueAsNumber: true,
           })}
           placeholder="Voer een weeknummer in"
           error={errors.week_number?.message}
         />
-        <p className="mt-1 text-xs text-gray-500">
-          Taken worden jaarlijks herhaald in dezelfde week
-        </p>
+        <p className="mt-1 text-xs text-gray-500">Taken worden jaarlijks herhaald in dezelfde week</p>
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
@@ -139,11 +118,7 @@ export const TaskForm = ({
           </Button>
         )}
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? "Opslaan..."
-            : initialValues
-            ? "Bijwerken"
-            : "Toevoegen"}
+          {isSubmitting ? 'Opslaan...' : initialValues ? 'Bijwerken' : 'Toevoegen'}
         </Button>
       </div>
     </form>

@@ -1,6 +1,7 @@
-import { Outlet, useLoaderData } from "react-router-dom";
-import { Navigation } from "./Navigation";
-import { AuthLoaderData } from "../lib/auth";
+import { Outlet, useLoaderData } from 'react-router-dom';
+
+import { AuthLoaderData } from '../lib/auth';
+import { Navigation } from './Navigation';
 
 export const Layout = () => {
   // Access the authentication state from the loader

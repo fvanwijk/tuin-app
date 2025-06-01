@@ -1,10 +1,7 @@
-import React from "react";
-import {
-  ReactZoomPanPinchContentRef,
-  TransformComponent,
-  TransformWrapper,
-} from "react-zoom-pan-pinch";
-import { Garden } from "../../api/fetchGarden";
+import React from 'react';
+import { ReactZoomPanPinchContentRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+
+import { Garden } from '../../api/fetchGarden';
 
 interface GardenEditModeProps {
   floorplanUrl: string;
@@ -13,12 +10,7 @@ interface GardenEditModeProps {
   transformRef: React.RefObject<ReactZoomPanPinchContentRef | null>;
 }
 
-export const GardenEditMode: React.FC<GardenEditModeProps> = ({
-  floorplanUrl,
-  garden,
-  aspectRatio,
-  transformRef,
-}) => {
+export const GardenEditMode: React.FC<GardenEditModeProps> = ({ floorplanUrl, garden, aspectRatio, transformRef }) => {
   return (
     <TransformWrapper
       ref={transformRef}
@@ -32,9 +24,9 @@ export const GardenEditMode: React.FC<GardenEditModeProps> = ({
     >
       <TransformComponent
         wrapperStyle={{
-          width: "100%",
-          height: "auto",
-          border: "1px solid #e2e8f0",
+          width: '100%',
+          height: 'auto',
+          border: '1px solid #e2e8f0',
         }}
       >
         <img

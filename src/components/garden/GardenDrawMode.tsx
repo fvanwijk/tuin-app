@@ -1,17 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Garden } from "../../api/fetchGarden";
-import { Stage, Layer, Circle, Transformer } from "react-konva";
-import Konva from "konva";
+import Konva from 'konva';
+import React, { useEffect, useRef, useState } from 'react';
+import { Circle, Layer, Stage, Transformer } from 'react-konva';
+
+import { Garden } from '../../api/fetchGarden';
+import { GardenMapPointInput } from '../../api/fetchGardenMapPoints';
+import { useGardenDimensions } from '../../hooks/useGardenDimensions';
 import {
-  useGardenMapPoints,
   useAddGardenMapPointMutation,
-  useUpdateGardenMapPointMutation,
   useDeleteGardenMapPointMutation,
-} from "../../hooks/useGardenMapPoints";
-import { GardenMapPointInput } from "../../api/fetchGardenMapPoints";
-import { useGardenDimensions } from "../../hooks/useGardenDimensions";
-import { MapPointForm } from "./MapPointForm";
-import { usePlantsQuery } from "../../hooks/usePlants";
+  useGardenMapPoints,
+  useUpdateGardenMapPointMutation,
+} from '../../hooks/useGardenMapPoints';
+import { usePlantsQuery } from '../../hooks/usePlants';
+import { MapPointForm } from './MapPointForm';
 
 interface GardenDrawModeProps {
   floorplanUrl: string;
@@ -19,18 +20,11 @@ interface GardenDrawModeProps {
   aspectRatio: string;
 }
 
-export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
-  floorplanUrl,
-  garden,
-  aspectRatio,
-}) => {
+export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({ floorplanUrl, garden, aspectRatio }) => {
   // Use the shared hook for dimensions and scaling
-  const { containerRef, dimensions, meterToPixelScale } =
-    useGardenDimensions(garden);
+  const { containerRef, dimensions, meterToPixelScale } = useGardenDimensions(garden);
 
-  const [circles, setCircles] = useState<
-    Array<{ id: string; x: number; y: number; radius: number }>
-  >([]);
+  const [circles, setCircles] = useState<Array<{ id: string; x: number; y: number; radius: number }>>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [newCirclePos, setNewCirclePos] = useState<{
@@ -66,9 +60,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   }, [gardenMapPoints]);
 
   // Check if a click occurred on empty space to deselect
-  const checkDeselect = (
-    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>
-  ) => {
+  const checkDeselect = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty && selectedId) {
       setSelectedId(null);
@@ -78,19 +70,12 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   };
 
   // Calculate distance between two points
-  const getDistance = (
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number
-  ): number => {
+  const getDistance = (x1: number, y1: number, x2: number, y2: number): number => {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   };
 
   // Handle stage mouse down - start drawing a new circle
-  const handleStageMouseDown = (
-    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>
-  ) => {
+  const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     // If we deselected something, don't add a new circle
     if (checkDeselect(e)) {
       return;
@@ -122,9 +107,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   };
 
   // Handle stage mouse move - update circle radius while drawing
-  const handleStageMouseMove = (
-    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>
-  ) => {
+  const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     if (!isDrawing || !newCirclePos) return;
 
     const stage = e.target.getStage();
@@ -137,15 +120,9 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     const centerY = meterToPixelScale(newCirclePos.y);
 
     // Calculate radius in pixels then convert to meters
-    const radiusInPixels = getDistance(
-      centerX,
-      centerY,
-      pointerPosition.x,
-      pointerPosition.y
-    );
+    const radiusInPixels = getDistance(centerX, centerY, pointerPosition.x, pointerPosition.y);
 
-    const radiusInMeters =
-      meterToPixelScale.invert(radiusInPixels) - meterToPixelScale.invert(0);
+    const radiusInMeters = meterToPixelScale.invert(radiusInPixels) - meterToPixelScale.invert(0);
 
     // Update the circle with the new radius
     setCircles(
@@ -154,7 +131,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           return { ...c, radius: Math.max(0.1, radiusInMeters) };
         }
         return c;
-      })
+      }),
     );
 
     // Update the tracking state
@@ -171,10 +148,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
       try {
         // Use default radius of 0.5 meters if radius is still at the initial value (0.1)
         // This means the user just clicked without dragging
-        const finalRadius =
-          Math.abs(newCirclePos.radius - 0.1) < 0.01
-            ? 0.5
-            : newCirclePos.radius;
+        const finalRadius = Math.abs(newCirclePos.radius - 0.1) < 0.01 ? 0.5 : newCirclePos.radius;
 
         // Save the circle to the database
         const newPointData: GardenMapPointInput = {
@@ -191,7 +165,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
               return { ...c, radius: finalRadius };
             }
             return c;
-          })
+          }),
         );
 
         // Save to database
@@ -200,18 +174,14 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         // Update with actual database ID
         if (result.data) {
           setCircles((prevCircles) =>
-            prevCircles.map((c) =>
-              c.id === newCirclePos.id ? { ...c, id: result.data!.id } : c
-            )
+            prevCircles.map((c) => (c.id === newCirclePos.id ? { ...c, id: result.data!.id } : c)),
           );
           setSelectedId(result.data.id);
         }
       } catch (error) {
-        console.error("Error saving garden map point:", error);
+        console.error('Error saving garden map point:', error);
         // Remove the temporary circle if saving failed
-        setCircles((prevCircles) =>
-          prevCircles.filter((c) => c.id !== newCirclePos.id)
-        );
+        setCircles((prevCircles) => prevCircles.filter((c) => c.id !== newCirclePos.id));
       } finally {
         // Reset the drawing state
         setIsDrawing(false);
@@ -220,18 +190,12 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     }
   };
 
-  const handleCircleClick = (
-    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>,
-    id: string
-  ) => {
+  const handleCircleClick = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>, id: string) => {
     e.cancelBubble = true; // Stop propagation to prevent stage click
     setSelectedId(id);
   };
 
-  const handleCircleDragEnd = async (
-    e: Konva.KonvaEventObject<Event>,
-    id: string
-  ) => {
+  const handleCircleDragEnd = async (e: Konva.KonvaEventObject<Event>, id: string) => {
     // Get the new position
     const node = e.target as Konva.Circle;
     const newX = meterToPixelScale.invert(node.x());
@@ -248,7 +212,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           };
         }
         return circle;
-      })
+      }),
     );
 
     // Update in database
@@ -261,14 +225,11 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         },
       });
     } catch (error) {
-      console.error("Error updating garden map point position:", error);
+      console.error('Error updating garden map point position:', error);
     }
   };
 
-  const handleTransformEnd = async (
-    _e: Konva.KonvaEventObject<Event>,
-    id: string
-  ) => {
+  const handleTransformEnd = async (_e: Konva.KonvaEventObject<Event>, id: string) => {
     // Get the transformed node
     const node = circleRefs.current.get(id);
     if (!node) return;
@@ -297,7 +258,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           };
         }
         return c;
-      })
+      }),
     );
 
     // Update in database
@@ -311,7 +272,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         },
       });
     } catch (error) {
-      console.error("Error updating garden map point after transform:", error);
+      console.error('Error updating garden map point after transform:', error);
     }
 
     // Reset scale to prevent continuous accumulation
@@ -322,7 +283,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   // Handle deletion on Delete or Backspace key press
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
         // Remove from local state
         setCircles(circles.filter((c) => c.id !== selectedId));
         setSelectedId(null);
@@ -331,13 +292,13 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         try {
           await deleteGardenMapPoint.mutateAsync(selectedId);
         } catch (error) {
-          console.error("Error deleting garden map point:", error);
+          console.error('Error deleting garden map point:', error);
         }
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedId, circles, deleteGardenMapPoint]);
 
   // Effect to update transformer nodes when selection changes
@@ -365,26 +326,24 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           x: point.x,
           y: point.y,
           radius: point.radius,
-        }))
+        })),
       );
     }
   }, [gardenMapPoints]);
 
   // Find the selected map point data from gardenMapPoints
-  const selectedMapPoint = selectedId
-    ? gardenMapPoints?.find((point) => point.id === selectedId)
-    : null;
+  const selectedMapPoint = selectedId ? gardenMapPoints?.find((point) => point.id === selectedId) : null;
 
   // Function to get circle color based on the associated plant
   const getCircleColor = (circleId: string) => {
-    const neutralColor = "rgba(128, 128, 128, 0.5)"; // Gray color for circles without plants
-    const neutralStroke = "rgba(128, 128, 128, 1)";
+    const neutralColor = 'rgba(128, 128, 128, 0.5)'; // Gray color for circles without plants
+    const neutralStroke = 'rgba(128, 128, 128, 1)';
 
     // If we're drawing this circle currently, make it transparent
     if (isDrawing && newCirclePos?.id === circleId) {
       return {
-        fill: "transparent",
-        stroke: "rgba(0, 150, 136, 1)", // Keep the outline visible
+        fill: 'transparent',
+        stroke: 'rgba(0, 150, 136, 1)', // Keep the outline visible
       };
     }
 
@@ -408,7 +367,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     }
 
     return {
-      fill: plant.color + "80", // 80 is 50% opacity in hex,
+      fill: plant.color + '80', // 80 is 50% opacity in hex,
       stroke: plant.color,
     };
   };
@@ -421,11 +380,9 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         className="w-full h-auto object-contain block"
         style={{
           aspectRatio,
-          transform: `translate(${garden.position_x || 0}px, ${
-            garden.position_y || 0
-          }px) scale(${garden.scale || 1})`,
-          transformOrigin: "left top",
-          cursor: "crosshair",
+          transform: `translate(${garden.position_x || 0}px, ${garden.position_y || 0}px) scale(${garden.scale || 1})`,
+          transformOrigin: 'left top',
+          cursor: 'crosshair',
         }}
       />
       {isLoading ? (
@@ -436,7 +393,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
         <Stage
           width={dimensions.width}
           height={dimensions.height}
-          style={{ position: "absolute", top: 0, left: 0 }}
+          style={{ position: 'absolute', top: 0, left: 0 }}
           onMouseDown={handleStageMouseDown}
           onMouseMove={handleStageMouseMove}
           onMouseUp={handleStageMouseUp}
@@ -461,12 +418,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
                   draggable
                   onClick={(e) => handleCircleClick(e, circle.id)}
                   onTap={(e) =>
-                    handleCircleClick(
-                      e as unknown as Konva.KonvaEventObject<
-                        MouseEvent | TouchEvent
-                      >,
-                      circle.id
-                    )
+                    handleCircleClick(e as unknown as Konva.KonvaEventObject<MouseEvent | TouchEvent>, circle.id)
                   }
                   onDragEnd={(e) => handleCircleDragEnd(e, circle.id)}
                   onTransformEnd={(e) => handleTransformEnd(e, circle.id)}
@@ -489,7 +441,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
                 }
                 return newBox;
               }}
-              enabledAnchors={["bottom-right"]}
+              enabledAnchors={['bottom-right']}
               centeredScaling
               ignoreStroke={true}
               rotateEnabled={false}

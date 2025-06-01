@@ -1,17 +1,10 @@
-import { WeekTasksCard } from "../components/calendar/WeekTaskCard";
-import { Card } from "../components/ui/Card";
-import { Tag } from "../components/ui/Tag";
-import {
-  useCurrentWeekTasksQuery,
-  useCompleteTaskMutation,
-} from "../hooks/usePlantTasks";
-import { usePlantsQuery } from "../hooks/usePlants";
-import {
-  getWeekNumber,
-  getCurrentYear,
-  TaskWithPlantDetails,
-} from "../api/fetchPlantTasks";
-import { getPlantTypeLabel } from "../components/plants/utils";
+import { TaskWithPlantDetails, getCurrentYear, getWeekNumber } from '../api/fetchPlantTasks';
+import { WeekTasksCard } from '../components/calendar/WeekTaskCard';
+import { getPlantTypeLabel } from '../components/plants/utils';
+import { Card } from '../components/ui/Card';
+import { Tag } from '../components/ui/Tag';
+import { useCompleteTaskMutation, useCurrentWeekTasksQuery } from '../hooks/usePlantTasks';
+import { usePlantsQuery } from '../hooks/usePlants';
 
 export const HomePage = () => {
   const currentWeek = getWeekNumber(new Date());
@@ -23,15 +16,13 @@ export const HomePage = () => {
 
   // Group plants by type
   const plantsByType = plants.reduce<Record<string, number>>((acc, plant) => {
-    const type = plant.type || "Onbekend";
+    const type = plant.type || 'Onbekend';
     acc[type] = (acc[type] || 0) + 1;
     return acc;
   }, {});
 
   // Sort types by count (descending)
-  const sortedTypes = Object.entries(plantsByType).sort(
-    ([, countA], [, countB]) => countB - countA
-  );
+  const sortedTypes = Object.entries(plantsByType).sort(([, countA], [, countB]) => countB - countA);
 
   const handleTaskComplete = (task: TaskWithPlantDetails) => {
     completeTaskMutation.mutate({
@@ -41,13 +32,8 @@ export const HomePage = () => {
     });
   };
 
-  const completedTasksCount = weekTasks.filter(
-    (task) => task.isCompletedThisYear
-  ).length;
-  const completionPercentage =
-    weekTasks.length > 0
-      ? Math.round((completedTasksCount / weekTasks.length) * 100)
-      : 0;
+  const completedTasksCount = weekTasks.filter((task) => task.isCompletedThisYear).length;
+  const completionPercentage = weekTasks.length > 0 ? Math.round((completedTasksCount / weekTasks.length) * 100) : 0;
 
   return (
     <div className="container p-4">
@@ -68,10 +54,7 @@ export const HomePage = () => {
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-green-600 h-2.5 rounded-full"
-                    style={{ width: `${completionPercentage}%` }}
-                  ></div>
+                  <div className="bg-green-600 h-2.5 rounded-full" style={{ width: `${completionPercentage}%` }}></div>
                 </div>
               </div>
               <WeekTasksCard
@@ -85,9 +68,7 @@ export const HomePage = () => {
           ) : (
             <Card>
               <div className="text-center p-6">
-                <p className="text-gray-500">
-                  Geen taken gepland voor deze week
-                </p>
+                <p className="text-gray-500">Geen taken gepland voor deze week</p>
               </div>
             </Card>
           )}
@@ -100,9 +81,7 @@ export const HomePage = () => {
             {plants.length > 0 ? (
               <div>
                 <div className="mb-4 flex justify-between items-center">
-                  <span className="text-lg font-medium">
-                    Totaal aantal planten
-                  </span>
+                  <span className="text-lg font-medium">Totaal aantal planten</span>
                   <Tag variant="success" size="md">
                     {plants.length}
                   </Tag>
@@ -113,9 +92,7 @@ export const HomePage = () => {
                   {sortedTypes.map(([type, count]) => (
                     <li key={type} className="bg-gray-50 rounded-lg p-3">
                       <div className="flex justify-between items-center">
-                        <span className="font-medium">
-                          {getPlantTypeLabel(type)}
-                        </span>
+                        <span className="font-medium">{getPlantTypeLabel(type)}</span>
                         <Tag variant="success" size="sm">
                           {count}
                         </Tag>
@@ -125,10 +102,7 @@ export const HomePage = () => {
                 </ul>
 
                 <div className="mt-4 text-center">
-                  <a
-                    href="/plants"
-                    className="text-green-600 hover:text-green-700 text-sm font-medium"
-                  >
+                  <a href="/plants" className="text-green-600 hover:text-green-700 text-sm font-medium">
                     Bekijk alle planten
                   </a>
                 </div>
@@ -136,10 +110,7 @@ export const HomePage = () => {
             ) : (
               <div className="text-center p-6">
                 <p className="text-gray-500">Nog geen planten toegevoegd</p>
-                <a
-                  href="/add-plant"
-                  className="mt-3 inline-block text-green-600 hover:text-green-700 font-medium"
-                >
+                <a href="/add-plant" className="mt-3 inline-block text-green-600 hover:text-green-700 font-medium">
                   Plant toevoegen
                 </a>
               </div>

@@ -1,17 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  addPlant,
-  updatePlant,
-  deletePlant,
-  fetchPlantById,
-  fetchPlants,
-} from "../api/fetchPlants";
-import { PlantFormData } from "../components/plants/PlantForm";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { addPlant, deletePlant, fetchPlantById, fetchPlants, updatePlant } from '../api/fetchPlants';
+import { PlantFormData } from '../components/plants/PlantForm';
 
 // Query hook for fetching all plants with their borders
 export const usePlantsQuery = (searchQuery?: string) => {
   return useQuery({
-    queryKey: ["plants", searchQuery],
+    queryKey: ['plants', searchQuery],
     queryFn: async () => {
       const { data, error } = await fetchPlants(searchQuery);
       if (error) throw error;
@@ -23,7 +18,7 @@ export const usePlantsQuery = (searchQuery?: string) => {
 // Query hook for fetching a single plant by ID
 export const usePlantByIdQuery = (id?: string) => {
   return useQuery({
-    queryKey: ["plant", id],
+    queryKey: ['plant', id],
     queryFn: async () => {
       if (!id) return null;
       const { data, error } = await fetchPlantById(id);
@@ -41,7 +36,7 @@ export const useAddPlantMutation = () => {
   return useMutation({
     mutationFn: (plant: PlantFormData) => addPlant(plant),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["plants"] });
+      queryClient.invalidateQueries({ queryKey: ['plants'] });
     },
   });
 };
@@ -53,8 +48,8 @@ export const useUpdatePlantMutation = () => {
   return useMutation({
     mutationFn: (plant: PlantFormData) => updatePlant(plant),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["plants"] });
-      queryClient.invalidateQueries({ queryKey: ["plant", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['plants'] });
+      queryClient.invalidateQueries({ queryKey: ['plant', variables.id] });
     },
   });
 };
@@ -66,8 +61,8 @@ export const useDeletePlantMutation = () => {
   return useMutation({
     mutationFn: (id: string) => deletePlant(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ["plants"] });
-      queryClient.invalidateQueries({ queryKey: ["plant", id] });
+      queryClient.invalidateQueries({ queryKey: ['plants'] });
+      queryClient.invalidateQueries({ queryKey: ['plant', id] });
     },
   });
 };

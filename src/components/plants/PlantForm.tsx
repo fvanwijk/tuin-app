@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Input } from "../ui/Input";
-import { Button } from "../ui/Button";
-import type { PlantBorder } from "../../api/fetchPlants";
-import { useBordersQuery } from "../../hooks/useBorders";
-import Select from "react-select";
-import { COLORS as PLANT_COLORS } from "../garden/colors";
+import { useState } from 'react';
+import Select from 'react-select';
+
+import type { PlantBorder } from '../../api/fetchPlants';
+import { useBordersQuery } from '../../hooks/useBorders';
+import { COLORS as PLANT_COLORS } from '../garden/colors';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 export interface PlantFormData {
   alive?: boolean | null;
@@ -24,11 +25,11 @@ interface PlantFormProps {
 }
 
 const PLANT_TYPES = [
-  { value: "heester", label: "Heester" },
-  { value: "klimmer", label: "Klimmer" },
-  { value: "vaste_plant", label: "Vaste plant" },
-  { value: "tweejarige", label: "Tweejarige" },
-  { value: "eenjarige", label: "Eenjarige" },
+  { value: 'heester', label: 'Heester' },
+  { value: 'klimmer', label: 'Klimmer' },
+  { value: 'vaste_plant', label: 'Vaste plant' },
+  { value: 'tweejarige', label: 'Tweejarige' },
+  { value: 'eenjarige', label: 'Eenjarige' },
 ];
 
 interface SelectOption {
@@ -36,35 +37,28 @@ interface SelectOption {
   label: string;
 }
 
-export const PlantForm = ({
-  initialValues = { name: "" },
-  onSubmit,
-  isSubmitting = false,
-}: PlantFormProps) => {
-  const [name, setName] = useState(initialValues.name || "");
-  const [nameDutch, setNameDutch] = useState(initialValues.name_nl || "");
+export const PlantForm = ({ initialValues = { name: '' }, onSubmit, isSubmitting = false }: PlantFormProps) => {
+  const [name, setName] = useState(initialValues.name || '');
+  const [nameDutch, setNameDutch] = useState(initialValues.name_nl || '');
   const [plantType, setPlantType] = useState<SelectOption | null>(
     initialValues.type
       ? {
           value: initialValues.type,
-          label:
-            PLANT_TYPES.find((t) => t.value === initialValues.type)?.label ||
-            initialValues.type,
+          label: PLANT_TYPES.find((t) => t.value === initialValues.type)?.label || initialValues.type,
         }
-      : null
+      : null,
   );
 
   // Convert initialValues.color string to array of color options
   const initialColors = initialValues.color
-    ? initialValues.color.split(",").map((c) => ({
+    ? initialValues.color.split(',').map((c) => ({
         value: c.trim(),
         label: c.trim().charAt(0).toUpperCase() + c.trim().slice(1),
       }))
     : [];
-  const [selectedColors, setSelectedColors] =
-    useState<SelectOption[]>(initialColors);
+  const [selectedColors, setSelectedColors] = useState<SelectOption[]>(initialColors);
 
-  const [comments, setComments] = useState(initialValues.comments || "");
+  const [comments, setComments] = useState(initialValues.comments || '');
   const [alive, setAlive] = useState(initialValues.alive !== false);
 
   const { data: borders = [], isLoading: isBordersLoading } = useBordersQuery();
@@ -76,9 +70,7 @@ export const PlantForm = ({
         label: border.name,
       }))
     : [];
-  const [selectedBorders, setSelectedBorders] = useState<SelectOption[]>(
-    initialSelectedBorders
-  );
+  const [selectedBorders, setSelectedBorders] = useState<SelectOption[]>(initialSelectedBorders);
 
   // Color options for the select input
   const colorOptions = PLANT_COLORS.map((color) => ({
@@ -96,17 +88,12 @@ export const PlantForm = ({
     e.preventDefault();
 
     // Format the color value from the array of selected colors
-    const formattedColor =
-      selectedColors.length > 0
-        ? selectedColors.map((option) => option.value).join(",")
-        : null;
+    const formattedColor = selectedColors.length > 0 ? selectedColors.map((option) => option.value).join(',') : null;
 
     // Map selected border options back to PlantBorder objects
     const formattedBorders =
       selectedBorders.length > 0
-        ? selectedBorders.map(
-            (option) => borders.find((border) => border.id === option.value)!
-          )
+        ? selectedBorders.map((option) => borders.find((border) => border.id === option.value)!)
         : [];
 
     onSubmit({
@@ -124,37 +111,19 @@ export const PlantForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
           Naam (Latijn)
         </label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
       </div>
       <div>
-        <label
-          htmlFor="name_nl"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="name_nl" className="block text-sm font-medium text-gray-700">
           Nederlandse naam
         </label>
-        <Input
-          id="name_nl"
-          value={nameDutch}
-          onChange={(e) => setNameDutch(e.target.value)}
-        />
+        <Input id="name_nl" value={nameDutch} onChange={(e) => setNameDutch(e.target.value)} />
       </div>
       <div>
-        <label
-          htmlFor="type"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
+        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
           Type
         </label>
         <Select
@@ -169,10 +138,7 @@ export const PlantForm = ({
         />
       </div>
       <div>
-        <label
-          htmlFor="colors"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
+        <label htmlFor="colors" className="block text-sm font-medium text-gray-700 mb-1">
           Kleuren
         </label>
         <Select
@@ -187,10 +153,7 @@ export const PlantForm = ({
         />
       </div>
       <div>
-        <label
-          htmlFor="borders"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
+        <label htmlFor="borders" className="block text-sm font-medium text-gray-700 mb-1">
           Borders
         </label>
         {isBordersLoading ? (
@@ -201,9 +164,7 @@ export const PlantForm = ({
             isMulti
             options={borderOptions}
             value={selectedBorders}
-            onChange={(selected) =>
-              setSelectedBorders(selected as SelectOption[])
-            }
+            onChange={(selected) => setSelectedBorders(selected as SelectOption[])}
             placeholder="Selecteer borders..."
             className="text-sm"
             classNamePrefix="react-select"
@@ -211,10 +172,7 @@ export const PlantForm = ({
         )}
       </div>
       <div>
-        <label
-          htmlFor="alive"
-          className="inline-flex items-center text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="alive" className="inline-flex items-center text-sm font-medium text-gray-700">
           <input
             type="checkbox"
             id="alive"
@@ -226,10 +184,7 @@ export const PlantForm = ({
         </label>
       </div>
       <div>
-        <label
-          htmlFor="comments"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="comments" className="block text-sm font-medium text-gray-700">
           Opmerkingen
         </label>
         <textarea
@@ -242,7 +197,7 @@ export const PlantForm = ({
       </div>
       <div className="flex justify-end">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Opslaan..." : "Opslaan"}
+          {isSubmitting ? 'Opslaan...' : 'Opslaan'}
         </Button>
       </div>
     </form>

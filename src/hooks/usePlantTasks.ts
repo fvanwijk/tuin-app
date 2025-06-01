@@ -1,21 +1,21 @@
-// filepath: /Users/fvanwijk/projects/tuin-app/src/hooks/usePlantTasks.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import {
+  PlantTaskData,
+  addTask,
+  completeTask,
+  deleteTask,
   fetchTasksByPlantId,
   fetchTasksByWeek,
-  addTask,
-  updateTask,
-  deleteTask,
-  completeTask,
-  PlantTaskData,
-  getWeekNumber,
   getCurrentYear,
-} from "../api/fetchPlantTasks";
+  getWeekNumber,
+  updateTask,
+} from '../api/fetchPlantTasks';
 
 // Query hook for fetching tasks for a specific plant
 export const usePlantTasksQuery = (plantId?: string) => {
   return useQuery({
-    queryKey: ["plant-tasks", plantId],
+    queryKey: ['plant-tasks', plantId],
     queryFn: async () => {
       if (!plantId) return [];
       const { data, error } = await fetchTasksByPlantId(plantId);
@@ -27,12 +27,9 @@ export const usePlantTasksQuery = (plantId?: string) => {
 };
 
 // Query hook for fetching tasks for a specific week
-export const useWeekTasksQuery = (
-  weekNumber: number,
-  year: number = getCurrentYear()
-) => {
+export const useWeekTasksQuery = (weekNumber: number, year: number = getCurrentYear()) => {
   return useQuery({
-    queryKey: ["week-tasks", weekNumber, year],
+    queryKey: ['week-tasks', weekNumber, year],
     queryFn: async () => {
       const result = await fetchTasksByWeek(weekNumber, year);
       return result.data || [];
@@ -54,11 +51,11 @@ export const useAddTaskMutation = () => {
     mutationFn: (task: PlantTaskData) => addTask(task),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["plant-tasks", variables.plant_id],
+        queryKey: ['plant-tasks', variables.plant_id],
       });
-      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ['all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['week-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['weeks-tasks'] });
     },
   });
 };
@@ -72,11 +69,11 @@ export const useUpdateTaskMutation = () => {
     onSuccess: (_, variables) => {
       if (variables.id) {
         queryClient.invalidateQueries({
-          queryKey: ["plant-tasks", variables.plant_id],
+          queryKey: ['plant-tasks', variables.plant_id],
         });
-        queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-        queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
-        queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
+        queryClient.invalidateQueries({ queryKey: ['all-tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['week-tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['weeks-tasks'] });
       }
     },
   });
@@ -99,10 +96,10 @@ export const useCompleteTaskMutation = () => {
       year?: number;
     }) => completeTask(taskId, plantId, completed, year),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["plant-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ['plant-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['week-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['weeks-tasks'] });
     },
   });
 };
@@ -114,10 +111,10 @@ export const useDeleteTaskMutation = () => {
   return useMutation({
     mutationFn: (id: string) => deleteTask(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["plant-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["week-tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["weeks-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ['plant-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['week-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['weeks-tasks'] });
     },
   });
 };

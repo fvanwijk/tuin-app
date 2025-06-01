@@ -1,25 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Garden,
-  fetchFloorplanUrl,
-  fetchGarden,
-  updateGarden,
-  uploadFloorplan,
-} from "../api/fetchGarden";
-import { useAuth } from "../lib/auth";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { Garden, fetchFloorplanUrl, fetchGarden, updateGarden, uploadFloorplan } from '../api/fetchGarden';
+import { useAuth } from '../lib/auth';
 
 export function useGarden() {
   const queryClient = useQueryClient();
 
   const gardenQuery = useQuery({
-    queryKey: ["garden"],
+    queryKey: ['garden'],
     queryFn: fetchGarden,
   });
 
   const updateGardenMutation = useMutation({
     mutationFn: updateGarden,
     onSuccess: (data) => {
-      queryClient.setQueryData(["garden"], data);
+      queryClient.setQueryData(['garden'], data);
     },
   });
 
@@ -27,21 +22,15 @@ export function useGarden() {
   const userId = auth?.user?.id;
 
   const uploadFloorplanMutation = useMutation({
-    mutationFn: async ({
-      file,
-      garden,
-    }: {
-      file: File;
-      garden: Partial<Garden>;
-    }) => {
+    mutationFn: async ({ file, garden }: { file: File; garden: Partial<Garden> }) => {
       if (!userId) {
-        throw new Error("User ID is required to upload the floorplan");
+        throw new Error('User ID is required to upload the floorplan');
       }
       const floorplan_path = await uploadFloorplan(file, userId);
       return updateGarden({ ...garden, floorplan_path });
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["garden"], data);
+      queryClient.setQueryData(['garden'], data);
     },
   });
 
@@ -58,7 +47,7 @@ export function useGarden() {
 
 export const useFloorplanUrl = (path?: string | null) =>
   useQuery({
-    queryKey: ["floorplan_path", path],
+    queryKey: ['floorplan_path', path],
     queryFn: async () => fetchFloorplanUrl(path!),
     enabled: !!path,
   });

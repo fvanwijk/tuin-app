@@ -1,8 +1,9 @@
-import { useEffect, RefObject } from "react";
-import * as d3 from "d3-selection";
-import { axisTop, axisLeft } from "d3-axis";
-import { scaleLinear } from "d3-scale";
-import { Garden } from "../api/fetchGarden";
+import { axisLeft, axisTop } from 'd3-axis';
+import { scaleLinear } from 'd3-scale';
+import * as d3 from 'd3-selection';
+import { RefObject, useEffect } from 'react';
+
+import { Garden } from '../api/fetchGarden';
 
 interface Margin {
   left: number;
@@ -25,30 +26,20 @@ export const useGardenAxes = (
   horizontalAxisRef: RefObject<SVGGElement | null>,
   verticalAxisRef: RefObject<SVGGElement | null>,
   containerWidth: number,
-  margin: Margin
+  margin: Margin,
 ) => {
   useEffect(() => {
-    if (
-      !garden ||
-      !horizontalAxisRef.current ||
-      !verticalAxisRef.current ||
-      !containerWidth
-    )
-      return;
+    if (!garden || !horizontalAxisRef.current || !verticalAxisRef.current || !containerWidth) return;
 
     const imageWidth = containerWidth - margin.left - margin.right;
     const imageHeight = imageWidth * (garden.height / garden.width);
 
-    d3.select(horizontalAxisRef.current).selectAll("*").remove();
-    d3.select(verticalAxisRef.current).selectAll("*").remove();
+    d3.select(horizontalAxisRef.current).selectAll('*').remove();
+    d3.select(verticalAxisRef.current).selectAll('*').remove();
 
-    const xScale = scaleLinear()
-      .domain([0, garden.width])
-      .range([0, imageWidth]);
+    const xScale = scaleLinear().domain([0, garden.width]).range([0, imageWidth]);
 
-    const yScale = scaleLinear()
-      .domain([0, garden.height])
-      .range([0, imageHeight]);
+    const yScale = scaleLinear().domain([0, garden.height]).range([0, imageHeight]);
 
     const xAxis = axisTop(xScale)
       .ticks(5)

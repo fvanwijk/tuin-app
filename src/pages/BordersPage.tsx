@@ -1,31 +1,27 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import type { BorderData } from '../api/fetchBorders';
+import { BorderFormDialog, DeleteBorderDialog } from '../components/borders/BorderDialogs';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 import {
-  useBordersQuery,
   useAddBorderMutation,
-  useUpdateBorderMutation,
-  useDeleteBorderMutation,
   useBorderByIdQuery,
-} from "../hooks/useBorders";
-import type { BorderData } from "../api/fetchBorders";
-import {
-  BorderFormDialog,
-  DeleteBorderDialog,
-} from "../components/borders/BorderDialogs";
+  useBordersQuery,
+  useDeleteBorderMutation,
+  useUpdateBorderMutation,
+} from '../hooks/useBorders';
 
 export const BordersPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
-  const isNewRoute = location.pathname === "/borders/new";
-  const isEditRoute = location.pathname.includes("/edit") && !!id;
+  const isNewRoute = location.pathname === '/borders/new';
+  const isEditRoute = location.pathname.includes('/edit') && !!id;
 
   const { data: borders, isLoading, error } = useBordersQuery();
-  const { data: borderToEdit } = useBorderByIdQuery(
-    isEditRoute ? id : undefined
-  );
+  const { data: borderToEdit } = useBorderByIdQuery(isEditRoute ? id : undefined);
   const addBorderMutation = useAddBorderMutation();
   const updateBorderMutation = useUpdateBorderMutation();
   const deleteBorderMutation = useDeleteBorderMutation();
@@ -54,15 +50,15 @@ export const BordersPage = () => {
   };
 
   const closeAddDialog = () => {
-    if (location.pathname === "/borders/new") {
-      navigate("/borders");
+    if (location.pathname === '/borders/new') {
+      navigate('/borders');
     }
   };
 
   const closeEditDialog = () => {
     setEditingBorder(null);
-    if (location.pathname.includes("/edit")) {
-      navigate("/borders");
+    if (location.pathname.includes('/edit')) {
+      navigate('/borders');
     }
   };
 
@@ -86,7 +82,7 @@ export const BordersPage = () => {
         closeAddDialog();
       }
     } catch (error) {
-      console.error("Failed to save border:", error);
+      console.error('Failed to save border:', error);
     }
   };
 
@@ -97,7 +93,7 @@ export const BordersPage = () => {
       await deleteBorderMutation.mutateAsync(borderToDelete.id!);
       closeDeleteDialog();
     } catch (error) {
-      console.error("Failed to delete border:", error);
+      console.error('Failed to delete border:', error);
     }
   };
 
@@ -129,10 +125,7 @@ export const BordersPage = () => {
         {borders && borders.length > 0 && (
           <ul className="divide-y divide-gray-200">
             {borders.map((border) => (
-              <li
-                key={border.id}
-                className="py-3 flex justify-between items-center"
-              >
+              <li key={border.id} className="py-3 flex justify-between items-center">
                 <span className="text-gray-900">{border.name}</span>
                 <div className="flex gap-2">
                   <button

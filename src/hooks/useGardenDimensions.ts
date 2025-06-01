@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { scaleLinear } from "d3-scale";
-import { Garden } from "../api/fetchGarden";
+import { scaleLinear } from 'd3-scale';
+import { useEffect, useRef, useState } from 'react';
+
+import { Garden } from '../api/fetchGarden';
 
 export interface GardenDimensions {
   width: number;
@@ -15,9 +16,7 @@ export const useGardenDimensions = (garden: Garden) => {
   });
 
   // Scale function to convert between meters and pixels
-  const meterToPixelScale = scaleLinear()
-    .domain([0, garden.width])
-    .range([0, dimensions.width]);
+  const meterToPixelScale = scaleLinear().domain([0, garden.width]).range([0, dimensions.width]);
 
   // Update container dimensions when component mounts or resizes
   const updateDimensions = () => {
@@ -29,10 +28,10 @@ export const useGardenDimensions = (garden: Garden) => {
 
   useEffect(() => {
     updateDimensions();
-    window.addEventListener("resize", updateDimensions);
+    window.addEventListener('resize', updateDimensions);
 
     return () => {
-      window.removeEventListener("resize", updateDimensions);
+      window.removeEventListener('resize', updateDimensions);
     };
   }, []);
 

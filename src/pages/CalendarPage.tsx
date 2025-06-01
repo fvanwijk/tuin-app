@@ -1,15 +1,9 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "../components/ui/Button";
-import {
-  useWeekTasksQuery,
-  useCompleteTaskMutation,
-} from "../hooks/usePlantTasks";
-import {
-  TaskWithPlantDetails,
-  getWeekNumber,
-  getCurrentYear,
-} from "../api/fetchPlantTasks";
-import { WeekTasksCard } from "../components/calendar/WeekTaskCard";
+import { useNavigate, useParams } from 'react-router-dom';
+
+import { TaskWithPlantDetails, getCurrentYear, getWeekNumber } from '../api/fetchPlantTasks';
+import { WeekTasksCard } from '../components/calendar/WeekTaskCard';
+import { Button } from '../components/ui/Button';
+import { useCompleteTaskMutation, useWeekTasksQuery } from '../hooks/usePlantTasks';
 
 export const CalendarPage = () => {
   const navigate = useNavigate();
@@ -38,10 +32,7 @@ export const CalendarPage = () => {
   const previousWeekYear = week === 1 ? year - 1 : year;
 
   // Years for the year selector (allow 5 years in past and 5 years in future)
-  const yearRange = Array.from(
-    { length: 11 },
-    (_, i) => currentSystemYear - 5 + i
-  );
+  const yearRange = Array.from({ length: 11 }, (_, i) => currentSystemYear - 5 + i);
 
   // Fetch tasks for each week individually
   const {
@@ -64,8 +55,7 @@ export const CalendarPage = () => {
 
   const completeTaskMutation = useCompleteTaskMutation();
 
-  const isLoading =
-    isLoadingCurrentWeek || isLoadingNextWeek || isLoadingFollowingWeek;
+  const isLoading = isLoadingCurrentWeek || isLoadingNextWeek || isLoadingFollowingWeek;
   const hasError = currentWeekError || nextWeekError || followingWeekError;
 
   // Handle direct navigation to another week
@@ -104,17 +94,13 @@ export const CalendarPage = () => {
     <div className="container p-4">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Tuinkalender</h1>
-        <p className="text-gray-600">
-          Bekijk en beheer je geplande taken per week voor het jaar {year}.
-        </p>
+        <p className="text-gray-600">Bekijk en beheer je geplande taken per week voor het jaar {year}.</p>
       </div>
 
       {/* Week navigation controls */}
       <div className="flex flex-wrap items-center justify-between mb-6 bg-gray-50 p-4 rounded-lg shadow-sm">
         <Button
-          onClick={() =>
-            navigate(`/calendar/${previousWeekYear}/${previousWeek}`)
-          }
+          onClick={() => navigate(`/calendar/${previousWeekYear}/${previousWeek}`)}
           variant="secondary"
           className="flex items-center mb-2 sm:mb-0"
         >
@@ -125,12 +111,7 @@ export const CalendarPage = () => {
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15 19l-7-7 7-7"
-            ></path>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
           </svg>
           Vorige week
         </Button>
@@ -146,7 +127,7 @@ export const CalendarPage = () => {
               {yearRange.map((yearOption) => (
                 <option key={yearOption} value={yearOption}>
                   {yearOption}
-                  {yearOption === currentSystemYear ? " (huidig)" : ""}
+                  {yearOption === currentSystemYear ? ' (huidig)' : ''}
                 </option>
               ))}
             </select>
@@ -162,18 +143,14 @@ export const CalendarPage = () => {
               {Array.from({ length: 52 }, (_, i) => i + 1).map((weekNum) => (
                 <option key={weekNum} value={weekNum}>
                   Week {weekNum}
-                  {weekNum === currentSystemWeek && year === currentSystemYear
-                    ? " (nu)"
-                    : ""}
+                  {weekNum === currentSystemWeek && year === currentSystemYear ? ' (nu)' : ''}
                 </option>
               ))}
             </select>
           </div>
 
           <Button
-            onClick={() =>
-              navigate(`/calendar/${currentSystemYear}/${currentSystemWeek}`)
-            }
+            onClick={() => navigate(`/calendar/${currentSystemYear}/${currentSystemWeek}`)}
             variant="secondary"
             className="text-sm"
           >
@@ -194,12 +171,7 @@ export const CalendarPage = () => {
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 5l7 7-7 7"
-            ></path>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </Button>
       </div>
@@ -223,9 +195,7 @@ export const CalendarPage = () => {
             weekNumber={week}
             tasks={currentWeekTasks}
             onTaskComplete={handleTaskCompletion}
-            isCurrentWeek={
-              week === currentSystemWeek && year === currentSystemYear
-            }
+            isCurrentWeek={week === currentSystemWeek && year === currentSystemYear}
             selectedYear={year}
           />
 
@@ -234,10 +204,7 @@ export const CalendarPage = () => {
             weekNumber={nextWeek}
             tasks={nextWeekTasks}
             onTaskComplete={handleTaskCompletion}
-            isCurrentWeek={
-              nextWeek === currentSystemWeek &&
-              nextWeekYear === currentSystemYear
-            }
+            isCurrentWeek={nextWeek === currentSystemWeek && nextWeekYear === currentSystemYear}
             selectedYear={nextWeekYear}
           />
 
@@ -246,10 +213,7 @@ export const CalendarPage = () => {
             weekNumber={followingWeek}
             tasks={followingWeekTasks}
             onTaskComplete={handleTaskCompletion}
-            isCurrentWeek={
-              followingWeek === currentSystemWeek &&
-              followingWeekYear === currentSystemYear
-            }
+            isCurrentWeek={followingWeek === currentSystemWeek && followingWeekYear === currentSystemYear}
             selectedYear={followingWeekYear}
           />
         </div>

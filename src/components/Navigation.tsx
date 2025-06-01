@@ -1,17 +1,15 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
-import { supabase } from "../lib/supabase/client";
-import { User } from "@supabase/supabase-js";
+import { User } from '@supabase/supabase-js';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+import { supabase } from '../lib/supabase/client';
 
 interface NavigationProps {
   isAuthenticated?: boolean;
   user?: User;
 }
 
-export const Navigation = ({
-  isAuthenticated = false,
-  user,
-}: NavigationProps) => {
+export const Navigation = ({ isAuthenticated = false, user }: NavigationProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,10 +17,10 @@ export const Navigation = ({
   const dropdownRef = useRef<HTMLLIElement>(null);
 
   const menuItems = [
-    { path: "/", label: "Home" },
-    { path: "/calendar", label: "Tuinkalender" },
-    { path: "/garden", label: "Mijn tuin" },
-    { path: "/plants", label: "Planten" },
+    { path: '/', label: 'Home' },
+    { path: '/calendar', label: 'Tuinkalender' },
+    { path: '/garden', label: 'Mijn tuin' },
+    { path: '/plants', label: 'Planten' },
   ];
 
   const toggleMenu = () => {
@@ -35,29 +33,26 @@ export const Navigation = ({
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
+    navigate('/login');
   };
 
   // Close dropdown when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileDropdownOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
   // Extract display name from user email or metadata
   const getUserDisplayName = () => {
-    if (!user) return "";
+    if (!user) return '';
 
     // Use user's metadata name if available
     if (user.user_metadata && user.user_metadata.name) {
@@ -66,10 +61,10 @@ export const Navigation = ({
 
     // Otherwise use the email address (without the domain part)
     if (user.email) {
-      return user.email.split("@")[0];
+      return user.email.split('@')[0];
     }
 
-    return "User";
+    return 'User';
   };
 
   return (
@@ -90,11 +85,7 @@ export const Navigation = ({
         </button>
 
         {/* Navigation menu - responsive */}
-        <div
-          className={`${
-            isMenuOpen ? "block" : "hidden"
-          } md:block w-full md:w-auto`}
-        >
+        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-auto`}>
           <ul className="flex flex-col md:flex-row md:items-center md:space-x-4 mt-4 md:mt-0">
             {isAuthenticated &&
               menuItems.map((item) => (
@@ -102,9 +93,7 @@ export const Navigation = ({
                   <Link
                     to={item.path}
                     className={`block p-2 hover:bg-green-600 rounded ${
-                      location.pathname === item.path
-                        ? "bg-green-600 font-bold"
-                        : ""
+                      location.pathname === item.path ? 'bg-green-600 font-bold' : ''
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -124,7 +113,7 @@ export const Navigation = ({
                   <span className="mr-1">{getUserDisplayName()}</span>
                   <svg
                     className={`h-4 w-4 transform transition-transform duration-200 ${
-                      isProfileDropdownOpen ? "rotate-180" : ""
+                      isProfileDropdownOpen ? 'rotate-180' : ''
                     }`}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -166,9 +155,7 @@ export const Navigation = ({
                 <Link
                   to="/login"
                   className={`block p-2 hover:bg-green-600 rounded ${
-                    location.pathname === "/login"
-                      ? "bg-green-600 font-bold"
-                      : ""
+                    location.pathname === '/login' ? 'bg-green-600 font-bold' : ''
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

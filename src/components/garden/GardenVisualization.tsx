@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Garden } from "../../api/fetchGarden";
-import { useGardenAxes } from "../../hooks/useGardenAxes";
-import { GardenEditor } from "./GardenEditor";
-import type { ReactZoomPanPinchContentRef } from "react-zoom-pan-pinch";
+import { useEffect, useRef, useState } from 'react';
+import type { ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch';
 
-export type GardenMode = "view" | "edit" | "draw";
+import { Garden } from '../../api/fetchGarden';
+import { useGardenAxes } from '../../hooks/useGardenAxes';
+import { GardenEditor } from './GardenEditor';
+
+export type GardenMode = 'view' | 'edit' | 'draw';
 
 interface GardenVisualizationProps {
   garden: Garden;
@@ -38,42 +39,31 @@ export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
     }
   }, []);
 
-  useGardenAxes(
-    garden,
-    horizontalAxisRef,
-    verticalAxisRef,
-    containerWidth,
-    margin
-  );
+  useGardenAxes(garden, horizontalAxisRef, verticalAxisRef, containerWidth, margin);
 
   const getModeDescription = () => {
-    if (mode === "edit") {
-      return window.matchMedia("(pointer: coarse)").matches
-        ? "Gebruik twee vingers om in/uit te zoomen en te verplaatsen"
-        : "Gebruik de muis om te slepen en het muiswiel om te zoomen";
-    } else if (mode === "draw") {
-      return "Teken modus - planten toevoegen";
+    if (mode === 'edit') {
+      return window.matchMedia('(pointer: coarse)').matches
+        ? 'Gebruik twee vingers om in/uit te zoomen en te verplaatsen'
+        : 'Gebruik de muis om te slepen en het muiswiel om te zoomen';
+    } else if (mode === 'draw') {
+      return 'Teken modus - planten toevoegen';
     }
-    return "";
+    return '';
   };
 
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">
         Tuinplattegrond
-        {mode !== "view" && (
-          <span className="ml-3 text-sm font-normal text-green-600">
-            {getModeDescription()}
-          </span>
-        )}
+        {mode !== 'view' && <span className="ml-3 text-sm font-normal text-green-600">{getModeDescription()}</span>}
       </h2>
       <div className="relative" ref={containerRef}>
         {containerWidth > 0 && (
           <svg
             width={containerWidth}
             height={
-              (containerWidth - margin.left + margin.right) *
-                (garden.height / garden.width) +
+              (containerWidth - margin.left + margin.right) * (garden.height / garden.width) +
               margin.top +
               margin.bottom
             }
@@ -87,12 +77,7 @@ export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
         )}
 
         <div className="p-[30px]">
-          <GardenEditor
-            garden={garden}
-            floorplanUrl={floorplanUrl}
-            mode={mode}
-            transformRef={transformRef}
-          />
+          <GardenEditor garden={garden} floorplanUrl={floorplanUrl} mode={mode} transformRef={transformRef} />
         </div>
       </div>
     </div>

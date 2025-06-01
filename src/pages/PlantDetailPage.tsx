@@ -1,17 +1,18 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { usePlantByIdQuery } from "../hooks/usePlants";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import { Tag } from "../components/ui/Tag";
-import { PlantTasks } from "../components/plants/PlantTasks";
-import { colorMap } from "../components/garden/colors";
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
+import { colorMap } from '../components/garden/colors';
+import { PlantTasks } from '../components/plants/PlantTasks';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Tag } from '../components/ui/Tag';
+import { usePlantByIdQuery } from '../hooks/usePlants';
 
 const PLANT_TYPE_LABELS: Record<string, string> = {
-  heester: "Heester",
-  klimmer: "Klimmer",
-  vaste_plant: "Vaste plant",
-  tweejarige: "Tweejarige",
-  eenjarige: "Eenjarige",
+  heester: 'Heester',
+  klimmer: 'Klimmer',
+  vaste_plant: 'Vaste plant',
+  tweejarige: 'Tweejarige',
+  eenjarige: 'Eenjarige',
 };
 
 export const PlantDetailPage = () => {
@@ -21,11 +22,11 @@ export const PlantDetailPage = () => {
 
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
-    return colorString.split(",").map((color) => color.trim());
+    return colorString.split(',').map((color) => color.trim());
   };
 
   const getPlantTypeLabel = (type: string | null): string => {
-    if (!type) return "Overig";
+    if (!type) return 'Overig';
     return PLANT_TYPE_LABELS[type] || type;
   };
 
@@ -45,9 +46,7 @@ export const PlantDetailPage = () => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Deze plant kon niet worden gevonden.
         </div>
-        <Button onClick={() => navigate("/plants")}>
-          Terug naar Mijn Tuin
-        </Button>
+        <Button onClick={() => navigate('/plants')}>Terug naar Mijn Tuin</Button>
       </div>
     );
   }
@@ -56,10 +55,7 @@ export const PlantDetailPage = () => {
     <div className="container p-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{plant.name_nl || plant.name}</h1>
-        <button
-          onClick={() => navigate("/plants")}
-          className="text-green-600 hover:text-green-800"
-        >
+        <button onClick={() => navigate('/plants')} className="text-green-600 hover:text-green-800">
           Terug naar Mijn Tuin
         </button>
       </div>
@@ -72,27 +68,17 @@ export const PlantDetailPage = () => {
               <div className="flex items-center">
                 <div className="w-32 font-medium text-gray-700">Status:</div>
                 <div className="flex items-center">
-                  <div
-                    className={`h-3 w-3 rounded-full ${
-                      plant.alive ? "bg-green-500" : "bg-gray-400"
-                    }`}
-                  ></div>
-                  <span className="ml-2">
-                    {plant.alive ? "Levend" : "Niet meer aanwezig"}
-                  </span>
+                  <div className={`h-3 w-3 rounded-full ${plant.alive ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                  <span className="ml-2">{plant.alive ? 'Levend' : 'Niet meer aanwezig'}</span>
                 </div>
               </div>
               <div className="flex">
-                <div className="w-32 font-medium text-gray-700">
-                  Latijnse naam:
-                </div>
+                <div className="w-32 font-medium text-gray-700">Latijnse naam:</div>
                 <div className="italic">{plant.name}</div>
               </div>
               {plant.name_nl && (
                 <div className="flex">
-                  <div className="w-32 font-medium text-gray-700">
-                    Nederlandse naam:
-                  </div>
+                  <div className="w-32 font-medium text-gray-700">Nederlandse naam:</div>
                   <div>{plant.name_nl}</div>
                 </div>
               )}
@@ -110,9 +96,7 @@ export const PlantDetailPage = () => {
                           className="h-4 w-4 rounded-full border border-gray-200"
                           style={{ backgroundColor: color }}
                         ></span>
-                        <span className="ml-1 text-sm">
-                          {colorMap.get(color)}
-                        </span>
+                        <span className="ml-1 text-sm">{colorMap.get(color)}</span>
                       </div>
                     ))}
                   </div>
@@ -132,17 +116,13 @@ export const PlantDetailPage = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 italic">
-                Deze plant is niet aan een border toegewezen
-              </p>
+              <p className="text-gray-500 italic">Deze plant is niet aan een border toegewezen</p>
             )}
 
             {plant.comments && (
               <div className="mt-6">
                 <h2 className="text-xl font-semibold mb-2">Notities</h2>
-                <p className="text-gray-800 whitespace-pre-wrap">
-                  {plant.comments}
-                </p>
+                <p className="text-gray-800 whitespace-pre-wrap">{plant.comments}</p>
               </div>
             )}
           </div>
@@ -157,10 +137,7 @@ export const PlantDetailPage = () => {
 
       {/* Plant Tasks section */}
       <Card className="mt-6">
-        <PlantTasks
-          plantId={plant.id}
-          plantName={plant.name_nl || plant.name}
-        />
+        <PlantTasks plantId={plant.id} plantName={plant.name_nl || plant.name} />
       </Card>
     </div>
   );

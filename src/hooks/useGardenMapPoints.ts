@@ -1,17 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import {
-  fetchGardenMapPoints,
-  fetchGardenMapPointById,
-  addGardenMapPoint,
-  updateGardenMapPoint,
-  deleteGardenMapPoint,
   GardenMapPointInput,
-} from "../api/fetchGardenMapPoints";
+  addGardenMapPoint,
+  deleteGardenMapPoint,
+  fetchGardenMapPointById,
+  fetchGardenMapPoints,
+  updateGardenMapPoint,
+} from '../api/fetchGardenMapPoints';
 
 // Query hook for fetching all garden map points for a garden
 export const useGardenMapPoints = (gardenId?: string) => {
   return useQuery({
-    queryKey: ["gardenMapPoints", gardenId],
+    queryKey: ['gardenMapPoints', gardenId],
     queryFn: async () => {
       if (!gardenId) return [];
       const { data, error } = await fetchGardenMapPoints(gardenId);
@@ -25,7 +26,7 @@ export const useGardenMapPoints = (gardenId?: string) => {
 // Query hook for fetching a single garden map point by ID
 export const useGardenMapPointById = (id?: string) => {
   return useQuery({
-    queryKey: ["gardenMapPoint", id],
+    queryKey: ['gardenMapPoint', id],
     queryFn: async () => {
       if (!id) return null;
       const { data, error } = await fetchGardenMapPointById(id);
@@ -44,7 +45,7 @@ export const useAddGardenMapPointMutation = () => {
     mutationFn: (point: GardenMapPointInput) => addGardenMapPoint(point),
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["gardenMapPoints", variables.garden_id],
+        queryKey: ['gardenMapPoints', variables.garden_id],
       });
     },
   });
@@ -55,20 +56,15 @@ export const useUpdateGardenMapPointMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: Partial<GardenMapPointInput>;
-    }) => updateGardenMapPoint(id, updates),
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<GardenMapPointInput> }) =>
+      updateGardenMapPoint(id, updates),
     onSuccess: (result) => {
       if (result.data) {
         queryClient.invalidateQueries({
-          queryKey: ["gardenMapPoints", result.data.garden_id],
+          queryKey: ['gardenMapPoints', result.data.garden_id],
         });
         queryClient.invalidateQueries({
-          queryKey: ["gardenMapPoint", result.data.id],
+          queryKey: ['gardenMapPoint', result.data.id],
         });
       }
     },
@@ -84,7 +80,7 @@ export const useDeleteGardenMapPointMutation = (gardenId?: string) => {
     onSuccess: () => {
       if (gardenId) {
         queryClient.invalidateQueries({
-          queryKey: ["gardenMapPoints", gardenId],
+          queryKey: ['gardenMapPoints', gardenId],
         });
       }
     },

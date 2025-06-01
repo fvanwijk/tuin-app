@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "format": "prettier --write .",
     "generate-types": "supabase gen types typescript --project-id rkiockcuapvnnxrdwrwn > ./src/lib/supabase/database.types.ts"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "d3-scale": "4.0.2",
     "d3-selection": "3.0.0",
     "konva": "9.3.20",
+    "prettier": "3.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "7.56.4",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "@tailwindcss/vite": "4.1.7",
+    "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/d3-axis": "3.0.6",
     "@types/d3-scale": "4.0.9",
     "@types/d3-selection": "3.0.11",

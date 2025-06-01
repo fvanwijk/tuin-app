@@ -1,17 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  addBorder,
-  updateBorder,
-  deleteBorder,
-  fetchBorderById,
-  fetchBorders,
-  BorderData,
-} from "../api/fetchBorders";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { BorderData, addBorder, deleteBorder, fetchBorderById, fetchBorders, updateBorder } from '../api/fetchBorders';
 
 // Query hook for fetching all borders
 export const useBordersQuery = () => {
   return useQuery({
-    queryKey: ["borders"],
+    queryKey: ['borders'],
     queryFn: async () => {
       const { data, error } = await fetchBorders();
       if (error) throw error;
@@ -23,7 +17,7 @@ export const useBordersQuery = () => {
 // Query hook for fetching a single border by ID
 export const useBorderByIdQuery = (id?: string) => {
   return useQuery({
-    queryKey: ["border", id],
+    queryKey: ['border', id],
     queryFn: async () => {
       if (!id) return null;
       const { data, error } = await fetchBorderById(id);
@@ -41,7 +35,7 @@ export const useAddBorderMutation = () => {
   return useMutation({
     mutationFn: (border: BorderData) => addBorder(border),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["borders"] });
+      queryClient.invalidateQueries({ queryKey: ['borders'] });
     },
   });
 };
@@ -53,10 +47,10 @@ export const useUpdateBorderMutation = () => {
   return useMutation({
     mutationFn: (border: BorderData) => updateBorder(border),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["borders"] });
-      queryClient.invalidateQueries({ queryKey: ["border", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['borders'] });
+      queryClient.invalidateQueries({ queryKey: ['border', variables.id] });
       // Also invalidate plants as they may display border information
-      queryClient.invalidateQueries({ queryKey: ["plants"] });
+      queryClient.invalidateQueries({ queryKey: ['plants'] });
     },
   });
 };
@@ -68,10 +62,10 @@ export const useDeleteBorderMutation = () => {
   return useMutation({
     mutationFn: (id: string) => deleteBorder(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ["borders"] });
-      queryClient.invalidateQueries({ queryKey: ["border", id] });
+      queryClient.invalidateQueries({ queryKey: ['borders'] });
+      queryClient.invalidateQueries({ queryKey: ['border', id] });
       // Also invalidate plants as they may display border information
-      queryClient.invalidateQueries({ queryKey: ["plants"] });
+      queryClient.invalidateQueries({ queryKey: ['plants'] });
     },
   });
 };

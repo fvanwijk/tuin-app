@@ -1,22 +1,20 @@
-import { Link } from "react-router-dom";
-import { usePlantsQuery } from "../hooks/usePlants";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { Tag } from "../components/ui/Tag";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import {
-  getPlantTypeLabel,
-  groupPlantsByType,
-} from "../components/plants/utils";
-import { colorMap } from "../components/garden/colors";
-import { useState } from "react";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { colorMap } from '../components/garden/colors';
+import { getPlantTypeLabel, groupPlantsByType } from '../components/plants/utils';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Tag } from '../components/ui/Tag';
+import { usePlantsQuery } from '../hooks/usePlants';
 
 export const PlantsPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const { data: plants, isLoading, error } = usePlantsQuery(searchQuery);
   const getColors = (colorString: string | null): string[] => {
     if (!colorString) return [];
-    return colorString.split(",").map((color) => color.trim());
+    return colorString.split(',').map((color) => color.trim());
   };
 
   const plantsByType = groupPlantsByType(plants);
@@ -48,16 +46,12 @@ export const PlantsPage = () => {
       {/* Display total number of filtered plants */}
       {plants && !isLoading && (
         <div className="mb-6">
-          <p
-            className={`text-sm ${
-              searchQuery ? "font-medium" : "text-gray-600"
-            }`}
-          >
+          <p className={`text-sm ${searchQuery ? 'font-medium' : 'text-gray-600'}`}>
             {plants.length === 0
-              ? "Geen planten gevonden"
+              ? 'Geen planten gevonden'
               : `${plants.length} ${
-                  plants.length === 1 ? "plant" : "planten"
-                } gevonden${searchQuery ? ` voor "${searchQuery}"` : ""}`}
+                  plants.length === 1 ? 'plant' : 'planten'
+                } gevonden${searchQuery ? ` voor "${searchQuery}"` : ''}`}
           </p>
         </div>
       )}
@@ -91,18 +85,14 @@ export const PlantsPage = () => {
                 className={({ selected }) =>
                   `w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none ${
                     selected
-                      ? "bg-white shadow text-green-700"
-                      : "text-gray-600 hover:bg-white/[0.25] hover:text-green-600"
+                      ? 'bg-white shadow text-green-700'
+                      : 'text-gray-600 hover:bg-white/[0.25] hover:text-green-600'
                   }`
                 }
               >
                 <div className="flex items-center justify-center">
                   <span>{getPlantTypeLabel(type)}</span>
-                  <Tag
-                    variant={plantsByType[type].length > 0 ? "success" : "gray"}
-                    size="sm"
-                    count
-                  >
+                  <Tag variant={plantsByType[type].length > 0 ? 'success' : 'gray'} size="sm" count>
                     {plantsByType[type].length}
                   </Tag>
                 </div>
@@ -111,20 +101,13 @@ export const PlantsPage = () => {
           </TabList>
           <TabPanels>
             {Object.entries(plantsByType).map(([type, plantsOfType]) => (
-              <TabPanel
-                key={type}
-                className="bg-white shadow overflow-hidden sm:rounded-md"
-              >
+              <TabPanel key={type} className="bg-white shadow overflow-hidden sm:rounded-md">
                 <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-800">
-                    {getPlantTypeLabel(type)}
-                  </h2>
+                  <h2 className="text-lg font-medium text-gray-800">{getPlantTypeLabel(type)}</h2>
                 </div>
                 {plantsOfType.length === 0 ? (
                   <div className="py-8 text-center">
-                    <p className="text-gray-500">
-                      Geen planten van dit type gevonden.
-                    </p>
+                    <p className="text-gray-500">Geen planten van dit type gevonden.</p>
                     <Link
                       to="/plants/add"
                       className="mt-3 inline-block text-green-600 hover:text-green-700 font-medium"
@@ -136,16 +119,13 @@ export const PlantsPage = () => {
                   <ul className="divide-y divide-gray-200">
                     {plantsOfType.map((plant) => (
                       <li key={plant.id}>
-                        <Link
-                          to={`/plants/${plant.id}`}
-                          className="block hover:bg-gray-50"
-                        >
+                        <Link to={`/plants/${plant.id}`} className="block hover:bg-gray-50">
                           <div className="px-4 py-4 sm:px-6">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center">
                                 <div
                                   className={`flex-shrink-0 h-3 w-3 rounded-full ${
-                                    plant.alive ? "bg-green-500" : "bg-gray-400"
+                                    plant.alive ? 'bg-green-500' : 'bg-gray-400'
                                   }`}
                                 ></div>
                                 <p className="ml-2 text-sm font-medium text-gray-900 truncate">
@@ -155,42 +135,29 @@ export const PlantsPage = () => {
                               <div className="ml-2 flex-shrink-0 flex">
                                 <div className="flex flex-wrap gap-1">
                                   {plant.borders &&
-                                    plant.borders.map(
-                                      (border: {
-                                        name: string;
-                                        id: string;
-                                      }) => (
-                                        <Tag
-                                          key={`${plant.id}-border-${border.id}`}
-                                          variant="success"
-                                          size="md"
-                                        >
-                                          {border.name}
-                                        </Tag>
-                                      )
-                                    )}
+                                    plant.borders.map((border: { name: string; id: string }) => (
+                                      <Tag key={`${plant.id}-border-${border.id}`} variant="success" size="md">
+                                        {border.name}
+                                      </Tag>
+                                    ))}
                                 </div>
                               </div>
                             </div>
                             <div className="mt-2 sm:flex sm:justify-between">
                               <div className="sm:flex">
-                                <p className="flex items-center text-sm text-gray-500 italic">
-                                  {plant.name}
-                                </p>
+                                <p className="flex items-center text-sm text-gray-500 italic">{plant.name}</p>
                               </div>
                               {plant.color && (
                                 <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                                   <div className="flex space-x-1">
-                                    {getColors(plant.color).map(
-                                      (color, index) => (
-                                        <span
-                                          key={`${plant.id}-${color}-${index}`}
-                                          className="h-4 w-4 rounded-full border border-gray-200"
-                                          style={{ backgroundColor: color }}
-                                          title={colorMap.get(color)}
-                                        ></span>
-                                      )
-                                    )}
+                                    {getColors(plant.color).map((color, index) => (
+                                      <span
+                                        key={`${plant.id}-${color}-${index}`}
+                                        className="h-4 w-4 rounded-full border border-gray-200"
+                                        style={{ backgroundColor: color }}
+                                        title={colorMap.get(color)}
+                                      ></span>
+                                    ))}
                                   </div>
                                 </div>
                               )}

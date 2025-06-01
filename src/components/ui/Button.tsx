@@ -1,38 +1,35 @@
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "primary" | "secondary" | "link";
+  variant?: 'primary' | 'secondary' | 'link';
   isLoading?: boolean;
   fullWidth?: boolean;
 }
 
 export const Button = ({
   children,
-  variant = "primary",
+  variant = 'primary',
   isLoading = false,
   fullWidth = false,
-  className = "",
+  className = '',
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    "flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2";
+    'flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2';
 
   const variantClasses = {
-    primary: "text-white bg-green-600 hover:bg-green-700 focus:ring-green-500",
-    secondary:
-      "text-green-700 bg-white border-green-600 hover:bg-gray-50 focus:ring-green-500",
-    link: "text-green-600 bg-transparent hover:underline p-0 border-0",
+    primary: 'text-white bg-green-600 hover:bg-green-700 focus:ring-green-500',
+    secondary: 'text-green-700 bg-white border-green-600 hover:bg-gray-50 focus:ring-green-500',
+    link: 'text-green-600 bg-transparent hover:underline p-0 border-0',
   };
 
-  const widthClass = fullWidth ? "w-full" : "";
+  const widthClass = fullWidth ? 'w-full' : '';
 
   return (
     <button
-      className={`${baseClasses} ${
-        variantClasses[variant]
-      } ${widthClass} ${className} ${
-        isLoading ? "opacity-70 cursor-not-allowed" : ""
+      className={`${baseClasses} ${variantClasses[variant]} ${widthClass} ${className} ${
+        isLoading ? 'opacity-70 cursor-not-allowed' : ''
       }`}
       disabled={isLoading || props.disabled}
       {...props}
@@ -45,14 +42,7 @@ export const Button = ({
             fill="none"
             viewBox="0 0 24 24"
           >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path
               className="opacity-75"
               fill="currentColor"

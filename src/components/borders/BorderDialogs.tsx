@@ -1,15 +1,10 @@
-import { Fragment, useEffect } from "react";
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import type { BorderData } from "../../api/fetchBorders";
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
+import { Fragment, useEffect } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+
+import type { BorderData } from '../../api/fetchBorders';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 type BorderFormValues = {
   name: string;
@@ -23,13 +18,7 @@ type BorderFormDialogProps = {
   border?: BorderData | null;
 };
 
-export const BorderFormDialog = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  isSubmitting,
-  border,
-}: BorderFormDialogProps) => {
+export const BorderFormDialog = ({ isOpen, onClose, onSubmit, isSubmitting, border }: BorderFormDialogProps) => {
   const isEditMode = !!border;
 
   const {
@@ -39,7 +28,7 @@ export const BorderFormDialog = ({
     reset,
   } = useForm<BorderFormValues>({
     defaultValues: {
-      name: border?.name || "",
+      name: border?.name || '',
     },
   });
 
@@ -48,7 +37,7 @@ export const BorderFormDialog = ({
     if (border) {
       reset({ name: border.name });
     } else {
-      reset({ name: "" });
+      reset({ name: '' });
     }
   }, [border, reset]);
 
@@ -60,14 +49,14 @@ export const BorderFormDialog = ({
     }
   };
 
-  const title = isEditMode ? "Border bewerken" : "Nieuwe border toevoegen";
+  const title = isEditMode ? 'Border bewerken' : 'Nieuwe border toevoegen';
   const buttonText = isEditMode
     ? isSubmitting
-      ? "Opslaan..."
-      : "Opslaan"
+      ? 'Opslaan...'
+      : 'Opslaan'
     : isSubmitting
-    ? "Toevoegen..."
-    : "Toevoegen";
+      ? 'Toevoegen...'
+      : 'Toevoegen';
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -96,39 +85,25 @@ export const BorderFormDialog = ({
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
-                >
+                <DialogTitle as="h3" className="text-lg font-medium leading-6 text-gray-900">
                   {title}
                 </DialogTitle>
                 <form onSubmit={handleSubmit(submitHandler)}>
                   <div className="mt-4">
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                       Naam
                     </label>
                     <Input
                       id="name"
-                      {...register("name", { required: "Naam is verplicht" })}
+                      {...register('name', { required: 'Naam is verplicht' })}
                       placeholder="Naam van de border"
                       autoFocus
                     />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.name.message}
-                      </p>
-                    )}
+                    {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
                   </div>
 
                   <div className="mt-6 flex justify-end gap-2">
-                    <Button
-                      type="button"
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                      onClick={onClose}
-                    >
+                    <Button type="button" className="bg-gray-200 hover:bg-gray-300 text-gray-800" onClick={onClose}>
                       Annuleren
                     </Button>
                     <Button type="submit" disabled={isSubmitting}>
@@ -153,13 +128,7 @@ type DeleteBorderDialogProps = {
   borderName?: string;
 };
 
-export const DeleteBorderDialog = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  isDeleting,
-  borderName,
-}: DeleteBorderDialogProps) => {
+export const DeleteBorderDialog = ({ isOpen, onClose, onConfirm, isDeleting, borderName }: DeleteBorderDialogProps) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -187,25 +156,18 @@ export const DeleteBorderDialog = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
-                >
+                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                   Border verwijderen
                 </Dialog.Title>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Weet je zeker dat je de border "{borderName}" wilt
-                    verwijderen? Dit kan niet ongedaan worden gemaakt.
+                    Weet je zeker dat je de border "{borderName}" wilt verwijderen? Dit kan niet ongedaan worden
+                    gemaakt.
                   </p>
                 </div>
 
                 <div className="mt-6 flex justify-end gap-2">
-                  <Button
-                    type="button"
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                    onClick={onClose}
-                  >
+                  <Button type="button" className="bg-gray-200 hover:bg-gray-300 text-gray-800" onClick={onClose}>
                     Annuleren
                   </Button>
                   <Button
@@ -214,7 +176,7 @@ export const DeleteBorderDialog = ({
                     onClick={onConfirm}
                     disabled={isDeleting}
                   >
-                    {isDeleting ? "Verwijderen..." : "Verwijderen"}
+                    {isDeleting ? 'Verwijderen...' : 'Verwijderen'}
                   </Button>
                 </div>
               </Dialog.Panel>

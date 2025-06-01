@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Card } from "../ui/Card";
-import { Input } from "../ui/Input";
-import Select from "react-select";
-import { usePlantsQuery } from "../../hooks/usePlants";
-import { useBordersQuery } from "../../hooks/useBorders";
-import { useUpdateGardenMapPointMutation } from "../../hooks/useGardenMapPoints";
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import Select from 'react-select';
+
+import { useBordersQuery } from '../../hooks/useBorders';
+import { useUpdateGardenMapPointMutation } from '../../hooks/useGardenMapPoints';
+import { usePlantsQuery } from '../../hooks/usePlants';
+import { Card } from '../ui/Card';
+import { Input } from '../ui/Input';
 
 interface SelectOption {
   value: string;
@@ -32,9 +33,7 @@ interface MapPointFormProps {
   };
 }
 
-export const MapPointForm: React.FC<MapPointFormProps> = ({
-  selectedPoint,
-}) => {
+export const MapPointForm: React.FC<MapPointFormProps> = ({ selectedPoint }) => {
   const { data: plants = [], isLoading: isPlantsLoading } = usePlantsQuery();
   const { data: borders = [], isLoading: isBordersLoading } = useBordersQuery();
   const updateGardenMapPoint = useUpdateGardenMapPointMutation();
@@ -107,7 +106,7 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
 
   // Handlers for select components
   const handlePlantChange = (selected: SelectOption | null) => {
-    setValue("plant_id", selected ? selected.value : null, {
+    setValue('plant_id', selected ? selected.value : null, {
       shouldDirty: true,
     });
     // Save changes immediately when plant selection changes
@@ -115,7 +114,7 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
   };
 
   const handleBorderChange = (selected: SelectOption | null) => {
-    setValue("border_id", selected ? selected.value : null, {
+    setValue('border_id', selected ? selected.value : null, {
       shouldDirty: true,
     });
     // Save changes immediately when border selection changes
@@ -123,12 +122,9 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
   };
 
   // Find current selected plant and border
-  const selectedPlantOption =
-    plantOptions.find((option) => option.value === formValues.plant_id) || null;
+  const selectedPlantOption = plantOptions.find((option) => option.value === formValues.plant_id) || null;
 
-  const selectedBorderOption =
-    borderOptions.find((option) => option.value === formValues.border_id) ||
-    null;
+  const selectedBorderOption = borderOptions.find((option) => option.value === formValues.border_id) || null;
 
   return (
     <Card className="mt-4">
@@ -136,15 +132,13 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
         <h3 className="text-lg font-semibold mb-4">Punt details</h3>
         <form className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              X positie (meters)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">X positie (meters)</label>
             <Input
               type="number"
               step="0.1"
-              {...register("x", {
+              {...register('x', {
                 valueAsNumber: true,
-                required: "X positie is verplicht",
+                required: 'X positie is verplicht',
               })}
               onBlur={saveChanges}
               error={errors.x?.message}
@@ -152,15 +146,13 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Y positie (meters)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Y positie (meters)</label>
             <Input
               type="number"
               step="0.1"
-              {...register("y", {
+              {...register('y', {
                 valueAsNumber: true,
-                required: "Y positie is verplicht",
+                required: 'Y positie is verplicht',
               })}
               onBlur={saveChanges}
               error={errors.y?.message}
@@ -168,19 +160,17 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Straal (meters)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Straal (meters)</label>
             <Input
               type="number"
               step="0.1"
               min="0.1"
-              {...register("radius", {
+              {...register('radius', {
                 valueAsNumber: true,
-                required: "Straal is verplicht",
+                required: 'Straal is verplicht',
                 min: {
                   value: 0.1,
-                  message: "Straal moet minimaal 0.1 meter zijn",
+                  message: 'Straal moet minimaal 0.1 meter zijn',
                 },
               })}
               onBlur={saveChanges}
@@ -189,9 +179,7 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
             />
           </div>
           <div className="col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Plant
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Plant</label>
             {isPlantsLoading ? (
               <p className="text-gray-500 text-sm">Planten laden...</p>
             ) : (
@@ -207,9 +195,7 @@ export const MapPointForm: React.FC<MapPointFormProps> = ({
             )}
           </div>
           <div className="col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Border
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Border</label>
             {isBordersLoading ? (
               <p className="text-gray-500 text-sm">Borders laden...</p>
             ) : (

@@ -1,26 +1,16 @@
-// filepath: /Users/fvanwijk/projects/tuin-app/src/components/plants/PlantTasks.tsx
-import { useState, Fragment } from "react";
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
+import { Fragment, useState } from 'react';
+
+import { PlantTask, PlantTaskData, getWeekNumber } from '../../api/fetchPlantTasks';
 import {
-  usePlantTasksQuery,
   useAddTaskMutation,
-  useUpdateTaskMutation,
   useDeleteTaskMutation,
-} from "../../hooks/usePlantTasks";
-import { Button } from "../ui/Button";
-import { Tag } from "../ui/Tag";
-import {
-  PlantTask,
-  PlantTaskData,
-  getWeekNumber,
-} from "../../api/fetchPlantTasks";
-import { TaskForm } from "./TaskForm";
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
+  usePlantTasksQuery,
+  useUpdateTaskMutation,
+} from '../../hooks/usePlantTasks';
+import { Button } from '../ui/Button';
+import { Tag } from '../ui/Tag';
+import { TaskForm } from './TaskForm';
 
 interface PlantTasksProps {
   plantId: string;
@@ -72,18 +62,12 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-medium text-gray-900">
-          Taken voor deze plant
-        </h2>
+        <h2 className="text-xl font-medium text-gray-900">Taken voor deze plant</h2>
         <Button onClick={() => setIsAddDialogOpen(true)}>Taak toevoegen</Button>
       </div>
 
       {isLoading && <p className="text-gray-500">Taken laden...</p>}
-      {error && (
-        <p className="text-red-500">
-          Er was een probleem bij het laden van de taken.
-        </p>
-      )}
+      {error && <p className="text-red-500">Er was een probleem bij het laden van de taken.</p>}
 
       {tasks && tasks.length === 0 ? (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
@@ -95,33 +79,25 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
             <li key={task.id} className="py-4">
               <div className="flex items-start">
                 <div className="ml-3 flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {task.title}
-                  </p>
-                  {task.description && (
-                    <p className="text-sm text-gray-600">{task.description}</p>
-                  )}
+                  <p className="text-sm font-medium text-gray-900">{task.title}</p>
+                  {task.description && <p className="text-sm text-gray-600">{task.description}</p>}
                   {task.week_number && (
                     <div
                       className={`text-xs ${
-                        task.week_number === currentWeek
-                          ? "font-bold text-green-600"
-                          : "text-gray-500"
+                        task.week_number === currentWeek ? 'font-bold text-green-600' : 'text-gray-500'
                       } mt-1`}
                     >
                       <Tag
-                        variant={
-                          task.week_number === currentWeek ? "success" : "gray"
-                        }
+                        variant={task.week_number === currentWeek ? 'success' : 'gray'}
                         size="md"
                         className={
                           task.week_number === currentWeek
-                            ? "ring-1 ring-inset ring-green-700/10"
-                            : "ring-1 ring-inset ring-gray-400/10"
+                            ? 'ring-1 ring-inset ring-green-700/10'
+                            : 'ring-1 ring-inset ring-gray-400/10'
                         }
                       >
                         Week {task.week_number}
-                        {task.week_number === currentWeek && " (huidige week)"}
+                        {task.week_number === currentWeek && ' (huidige week)'}
                       </Tag>
                     </div>
                   )}
@@ -156,11 +132,7 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
 
       {/* Add Task Dialog */}
       <Transition appear show={isAddDialogOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-10"
-          onClose={() => setIsAddDialogOpen(false)}
-        >
+        <Dialog as="div" className="relative z-10" onClose={() => setIsAddDialogOpen(false)}>
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -185,10 +157,7 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <DialogTitle
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
+                  <DialogTitle as="h3" className="text-lg font-medium leading-6 text-gray-900">
                     Taak toevoegen voor {plantName}
                   </DialogTitle>
 
@@ -209,11 +178,7 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
 
       {/* Edit Task Dialog */}
       <Transition appear show={isEditDialogOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-10"
-          onClose={() => setIsEditDialogOpen(false)}
-        >
+        <Dialog as="div" className="relative z-10" onClose={() => setIsEditDialogOpen(false)}>
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -238,10 +203,7 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <DialogTitle
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
+                  <DialogTitle as="h3" className="text-lg font-medium leading-6 text-gray-900">
                     Taak bewerken voor {plantName}
                   </DialogTitle>
 
@@ -265,11 +227,7 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
 
       {/* Delete Confirmation Dialog */}
       <Transition appear show={isDeleteDialogOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-10"
-          onClose={() => setIsDeleteDialogOpen(false)}
-        >
+        <Dialog as="div" className="relative z-10" onClose={() => setIsDeleteDialogOpen(false)}>
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -294,26 +252,18 @@ export const PlantTasks = ({ plantId, plantName }: PlantTasksProps) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <DialogTitle
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
+                  <DialogTitle as="h3" className="text-lg font-medium leading-6 text-gray-900">
                     Taak verwijderen
                   </DialogTitle>
 
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Weet je zeker dat je de taak "{currentTask?.title}" wilt
-                      verwijderen?
+                      Weet je zeker dat je de taak "{currentTask?.title}" wilt verwijderen?
                     </p>
                   </div>
 
                   <div className="mt-6 flex justify-end gap-2">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => setIsDeleteDialogOpen(false)}
-                    >
+                    <Button type="button" variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
                       Annuleren
                     </Button>
                     <Button
