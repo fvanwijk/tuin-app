@@ -11,6 +11,7 @@ import {
 import { GardenMapPointInput } from "../../api/fetchGardenMapPoints";
 import { useGardenDimensions } from "../../hooks/useGardenDimensions";
 import { MapPointForm } from "./MapPointForm";
+import { usePlantsQuery } from "../../hooks/usePlants";
 
 interface GardenDrawModeProps {
   floorplanUrl: string;
@@ -46,6 +47,9 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
   const addGardenMapPoint = useAddGardenMapPointMutation();
   const updateGardenMapPoint = useUpdateGardenMapPointMutation();
   const deleteGardenMapPoint = useDeleteGardenMapPointMutation(garden.id);
+
+  // Get plants data for colors
+  const { data: plants = [] } = usePlantsQuery();
 
   // Load existing garden map points from database
   useEffect(() => {
@@ -371,6 +375,60 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
     ? gardenMapPoints?.find((point) => point.id === selectedId)
     : null;
 
+  // Function to get circle color based on the associated plant
+  const getCircleColor = (circleId: string) => {
+    const neutralColor = "rgba(128, 128, 128, 0.5)"; // Gray color for circles without plants
+    const neutralStroke = "rgba(128, 128, 128, 1)";
+
+    // If we're drawing this circle currently, make it transparent
+    if (isDrawing && newCirclePos?.id === circleId) {
+      return {
+        fill: "transparent",
+        stroke: "rgba(0, 150, 136, 1)", // Keep the outline visible
+      };
+    }
+
+    // Find the map point details
+    const mapPoint = gardenMapPoints?.find((point) => point.id === circleId);
+    if (!mapPoint || !mapPoint.plant_id) {
+      // No plant is associated with this circle
+      return {
+        fill: neutralColor,
+        stroke: neutralStroke,
+      };
+    }
+
+    // Find the plant with its color
+    const plant = plants.find((p) => p.id === mapPoint.plant_id);
+    if (!plant || !plant.color) {
+      return {
+        fill: neutralColor,
+        stroke: neutralStroke,
+      };
+    }
+
+    // Use the plant's color with 50% opacity for fill
+    const color = plant.color;
+    let fill;
+
+    // Handle both hex and rgb color formats
+    if (color.startsWith("#")) {
+      // For hex colors, add opacity
+      fill = color + "80"; // 80 is 50% opacity in hex
+    } else if (color.startsWith("rgb")) {
+      // For rgb colors, convert to rgba
+      fill = color.replace("rgb", "rgba").replace(")", ", 0.5)");
+    } else {
+      // For any other format, use as is with some opacity
+      fill = `${color}80`;
+    }
+
+    return {
+      fill,
+      stroke: color,
+    };
+  };
+
   return (
     <div className="border overflow-hidden relative" ref={containerRef}>
       <img
@@ -403,38 +461,41 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
           onTouchEnd={handleStageMouseUp}
         >
           <Layer>
-            {circles.map((circle, i) => (
-              <Circle
-                key={i}
-                id={circle.id}
-                strokeScaleEnabled={false}
-                x={meterToPixelScale(circle.x)}
-                y={meterToPixelScale(circle.y)}
-                radius={meterToPixelScale(circle.radius)}
-                fill={isDrawing && newCirclePos?.id === circle.id ? "transparent" : "rgba(0, 150, 136, 0.5)"}
-                stroke={"rgba(0, 150, 136, 1)"}
-                strokeWidth={2}
-                draggable
-                onClick={(e) => handleCircleClick(e, circle.id)}
-                onTap={(e) =>
-                  handleCircleClick(
-                    e as unknown as Konva.KonvaEventObject<
-                      MouseEvent | TouchEvent
-                    >,
-                    circle.id
-                  )
-                }
-                onDragEnd={(e) => handleCircleDragEnd(e, circle.id)}
-                onTransformEnd={(e) => handleTransformEnd(e, circle.id)}
-                ref={(node) => {
-                  if (node) {
-                    circleRefs.current.set(circle.id, node);
-                  } else {
-                    circleRefs.current.delete(circle.id);
+            {circles.map((circle, i) => {
+              const { fill, stroke } = getCircleColor(circle.id);
+              return (
+                <Circle
+                  key={i}
+                  id={circle.id}
+                  strokeScaleEnabled={false}
+                  x={meterToPixelScale(circle.x)}
+                  y={meterToPixelScale(circle.y)}
+                  radius={meterToPixelScale(circle.radius)}
+                  fill={fill}
+                  stroke={stroke}
+                  strokeWidth={2}
+                  draggable
+                  onClick={(e) => handleCircleClick(e, circle.id)}
+                  onTap={(e) =>
+                    handleCircleClick(
+                      e as unknown as Konva.KonvaEventObject<
+                        MouseEvent | TouchEvent
+                      >,
+                      circle.id
+                    )
                   }
-                }}
-              />
-            ))}
+                  onDragEnd={(e) => handleCircleDragEnd(e, circle.id)}
+                  onTransformEnd={(e) => handleTransformEnd(e, circle.id)}
+                  ref={(node) => {
+                    if (node) {
+                      circleRefs.current.set(circle.id, node);
+                    } else {
+                      circleRefs.current.delete(circle.id);
+                    }
+                  }}
+                />
+              );
+            })}
             <Transformer
               ref={transformerRef}
               boundBoxFunc={(oldBox, newBox) => {
