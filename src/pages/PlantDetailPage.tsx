@@ -1,9 +1,9 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { usePlantByIdQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { PlantTasks } from "../components/plants/PlantTasks";
-import { Link } from "react-router-dom";
+import { colorMap } from "../components/garden/colors";
 
 const PLANT_TYPE_LABELS: Record<string, string> = {
   heester: "Heester",
@@ -109,7 +109,9 @@ export const PlantDetailPage = () => {
                           className="h-4 w-4 rounded-full border border-gray-200"
                           style={{ backgroundColor: color }}
                         ></span>
-                        <span className="ml-1 text-sm">{color}</span>
+                        <span className="ml-1 text-sm">
+                          {colorMap.get(color)}
+                        </span>
                       </div>
                     ))}
                   </div>

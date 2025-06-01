@@ -4,6 +4,7 @@ import { Button } from "../ui/Button";
 import type { PlantBorder } from "../../api/fetchPlants";
 import { useBordersQuery } from "../../hooks/useBorders";
 import Select from "react-select";
+import { COLORS as PLANT_COLORS } from "../garden/colors";
 
 export interface PlantFormData {
   alive?: boolean | null;
@@ -21,22 +22,6 @@ interface PlantFormProps {
   onSubmit: (data: PlantFormData) => void;
   isSubmitting?: boolean;
 }
-
-// Common plant flower colors
-const COMMON_COLORS = [
-  "red",
-  "pink",
-  "orange",
-  "yellow",
-  "white",
-  "cream",
-  "blue",
-  "purple",
-  "green",
-  "brown",
-  "black",
-  "mixed",
-];
 
 const PLANT_TYPES = [
   { value: "heester", label: "Heester" },
@@ -96,9 +81,9 @@ export const PlantForm = ({
   );
 
   // Color options for the select input
-  const colorOptions = COMMON_COLORS.map((color) => ({
-    value: color,
-    label: color.charAt(0).toUpperCase() + color.slice(1),
+  const colorOptions = PLANT_COLORS.map((color) => ({
+    value: color.rgb,
+    label: color.colorName,
   }));
 
   // Border options for the select input

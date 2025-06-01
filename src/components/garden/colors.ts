@@ -1,0 +1,33 @@
+export const COLORS: { colorName: string; rgb: string }[] = [
+  { colorName: "Blauw", rgb: "#1E90FF" },
+  { colorName: "Bordeaux", rgb: "#800020" },
+  { colorName: "Bruin", rgb: "#A0522D" },
+  { colorName: "Bruinrood", rgb: "#A52A2A" },
+  { colorName: "Crèmewit", rgb: "#FFFDD0" },
+  { colorName: "Donkerrood", rgb: "#8B0000" },
+  { colorName: "Fuchsia", rgb: "#FF00FF" },
+  { colorName: "Geel", rgb: "#FFFF00" },
+  { colorName: "Groen", rgb: "#008000" },
+  { colorName: "Indigo", rgb: "#4B0082" },
+  { colorName: "Koper", rgb: "#B87333" },
+  { colorName: "Lavendel", rgb: "#E6E6FA" },
+  { colorName: "Lichtpaars", rgb: "#D8BFD8" },
+  { colorName: "Lichtroze", rgb: "#FFB6C1" },
+  { colorName: "Lila", rgb: "#C8A2C8" },
+  { colorName: "Limoengroen", rgb: "#32CD32" },
+  { colorName: "Mintgroen", rgb: "#98FB98" },
+  { colorName: "Mosgroen", rgb: "#6B8E23" },
+  { colorName: "Olijfgroen", rgb: "#808000" },
+  { colorName: "Oranje", rgb: "#FFA500" },
+  { colorName: "Paars", rgb: "#800080" },
+  { colorName: "Rood", rgb: "#FF0000" },
+  { colorName: "Roze", rgb: "#FFC0CB" },
+  { colorName: "Terracotta", rgb: "#E2725B" },
+  { colorName: "Turkoois", rgb: "#40E0D0" },
+  { colorName: "Wit", rgb: "#FFFFFF" },
+  { colorName: "Zalmroze", rgb: "#FA8072" },
+];
+
+export const colorMap = new Map(
+  COLORS.map(({ rgb, colorName }) => [rgb, colorName])
+);

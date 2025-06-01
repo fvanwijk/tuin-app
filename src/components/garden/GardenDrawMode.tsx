@@ -407,25 +407,9 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({
       };
     }
 
-    // Use the plant's color with 50% opacity for fill
-    const color = plant.color;
-    let fill;
-
-    // Handle both hex and rgb color formats
-    if (color.startsWith("#")) {
-      // For hex colors, add opacity
-      fill = color + "80"; // 80 is 50% opacity in hex
-    } else if (color.startsWith("rgb")) {
-      // For rgb colors, convert to rgba
-      fill = color.replace("rgb", "rgba").replace(")", ", 0.5)");
-    } else {
-      // For any other format, use as is with some opacity
-      fill = `${color}80`;
-    }
-
     return {
-      fill,
-      stroke: color,
+      fill: plant.color + "80", // 80 is 50% opacity in hex,
+      stroke: plant.color,
     };
   };
 

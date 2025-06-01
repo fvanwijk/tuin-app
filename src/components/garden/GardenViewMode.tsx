@@ -3,6 +3,7 @@ import { Garden } from "../../api/fetchGarden";
 import { Stage, Layer, Circle } from "react-konva";
 import { useGardenMapPoints } from "../../hooks/useGardenMapPoints";
 import { useGardenDimensions } from "../../hooks/useGardenDimensions";
+import { usePlantsQuery } from "../../hooks/usePlants";
 
 interface GardenViewModeProps {
   floorplanUrl: string;
@@ -19,8 +20,8 @@ export const GardenViewMode: React.FC<GardenViewModeProps> = ({
   const { containerRef, dimensions, meterToPixelScale } =
     useGardenDimensions(garden);
 
-  // Fetch garden map points from the database
   const { data: gardenMapPoints, isLoading } = useGardenMapPoints(garden.id);
+  const { data: plants } = usePlantsQuery();
 
   return (
     <div className="border overflow-hidden relative" ref={containerRef}>
@@ -49,19 +50,26 @@ export const GardenViewMode: React.FC<GardenViewModeProps> = ({
           }}
         >
           <Layer>
-            {gardenMapPoints.map((point) => (
-              <Circle
-                key={point.id}
-                id={point.id}
-                strokeScaleEnabled={false}
-                x={meterToPixelScale(point.x)}
-                y={meterToPixelScale(point.y)}
-                radius={meterToPixelScale(point.radius || 0.5)}
-                fill="rgba(0, 150, 136, 0.5)"
-                stroke={"rgba(0, 150, 136, 1)"}
-                strokeWidth={2}
-              />
-            ))}
+            {gardenMapPoints.map((point) => {
+              const plant = plants?.find((p) => p.id === point.plant_id);
+              const color = plant?.color?.split(",")[0] || "#808080";
+              const style = {
+                fill: color + "80", // 80 is 50% opacity in hex,,
+                stroke: color,
+              };
+              return (
+                <Circle
+                  key={point.id}
+                  id={point.id}
+                  strokeScaleEnabled={false}
+                  x={meterToPixelScale(point.x)}
+                  y={meterToPixelScale(point.y)}
+                  radius={meterToPixelScale(point.radius || 0.5)}
+                  strokeWidth={2}
+                  {...style}
+                />
+              );
+            })}
           </Layer>
         </Stage>
       )}

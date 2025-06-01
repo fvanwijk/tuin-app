@@ -3,6 +3,7 @@ import { usePlantsQuery } from "../hooks/usePlants";
 import { Button } from "../components/ui/Button";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { getPlantTypeLabel } from "../components/plants/utils";
+import { colorMap } from "../components/garden/colors";
 
 export const PlantsPage = () => {
   const { data: plants, isLoading, error } = usePlantsQuery();
@@ -137,7 +138,7 @@ export const PlantsPage = () => {
                                           key={`${plant.id}-${color}-${index}`}
                                           className="h-4 w-4 rounded-full border border-gray-200"
                                           style={{ backgroundColor: color }}
-                                          title={color}
+                                          title={colorMap.get(color)}
                                         ></span>
                                       )
                                     )}
