@@ -17,12 +17,13 @@ export const useGardenDimensions = (garden: Garden) => {
 
   // Scale function to convert between meters and pixels
   const meterToPixelScale = scaleLinear().domain([0, garden.width]).range([0, dimensions.width]);
+  const gardenRatio = garden.height / garden.width;
 
   // Update container dimensions when component mounts or resizes
   const updateDimensions = () => {
     if (containerRef.current) {
-      const { width, height } = containerRef.current.getBoundingClientRect();
-      setDimensions({ width, height });
+      const { width } = containerRef.current.getBoundingClientRect();
+      setDimensions({ width, height: width * gardenRatio });
     }
   };
 
@@ -39,6 +40,7 @@ export const useGardenDimensions = (garden: Garden) => {
     containerRef,
     dimensions,
     meterToPixelScale,
+    ratio: gardenRatio,
     updateDimensions,
   };
 };

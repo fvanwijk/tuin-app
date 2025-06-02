@@ -1,6 +1,6 @@
-import Konva from 'konva';
-import React, { useEffect, useRef, useState } from 'react';
-import { Circle, Layer, Stage, Transformer } from 'react-konva';
+import type Konva from 'konva';
+import { useEffect, useRef, useState } from 'react';
+import { Circle, Image, Layer, Stage, Transformer } from 'react-konva';
 
 import { Garden } from '../../api/fetchGarden';
 import { GardenMapPointInput } from '../../api/fetchGardenMapPoints';
@@ -13,16 +13,17 @@ import {
 } from '../../hooks/useGardenMapPoints';
 import { usePlantsQuery } from '../../hooks/usePlants';
 import { MapPointForm } from './MapPointForm';
+import useImage from 'use-image';
 
 interface GardenDrawModeProps {
   floorplanUrl: string;
   garden: Garden;
-  aspectRatio: string;
 }
 
-export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({ floorplanUrl, garden, aspectRatio }) => {
+export const GardenDrawMode = ({ floorplanUrl, garden }: GardenDrawModeProps) => {
   // Use the shared hook for dimensions and scaling
   const { containerRef, dimensions, meterToPixelScale } = useGardenDimensions(garden);
+  const [image] = useImage(floorplanUrl);
 
   const [circles, setCircles] = useState<Array<{ id: string; x: number; y: number; radius: number }>>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -374,17 +375,6 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({ floorplanUrl, ga
 
   return (
     <div className="border overflow-hidden relative" ref={containerRef}>
-      <img
-        src={floorplanUrl}
-        alt="Tuinplattegrond"
-        className="w-full h-auto object-contain block"
-        style={{
-          aspectRatio,
-          transform: `translate(${garden.position_x || 0}px, ${garden.position_y || 0}px) scale(${garden.scale || 1})`,
-          transformOrigin: 'left top',
-          cursor: 'crosshair',
-        }}
-      />
       {isLoading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
           <div className="text-green-600">Kaartpunten laden...</div>
@@ -393,7 +383,7 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({ floorplanUrl, ga
         <Stage
           width={dimensions.width}
           height={dimensions.height}
-          style={{ position: 'absolute', top: 0, left: 0 }}
+          scale={{ x: meterToPixelScale(1), y: meterToPixelScale(1) }}
           onMouseDown={handleStageMouseDown}
           onMouseMove={handleStageMouseMove}
           onMouseUp={handleStageMouseUp}
@@ -401,6 +391,19 @@ export const GardenDrawMode: React.FC<GardenDrawModeProps> = ({ floorplanUrl, ga
           onTouchMove={handleStageMouseMove}
           onTouchEnd={handleStageMouseUp}
         >
+          {image && (
+            <Layer>
+              <Image
+                alt="Tuinplattegrond"
+                image={image}
+                width={garden.width}
+                height={garden.height}
+                scale={{ x: garden.scale, y: garden.scale }}
+                x={garden.position_x}
+                y={garden.position_y}
+              />
+            </Layer>
+          )}
           <Layer>
             {circles.map((circle, i) => {
               const { fill, stroke } = getCircleColor(circle.id);

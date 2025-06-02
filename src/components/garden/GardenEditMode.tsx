@@ -1,44 +1,81 @@
-import React from 'react';
-import { ReactZoomPanPinchContentRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { useEffect, useRef, useState } from 'react';
 
 import { Garden } from '../../api/fetchGarden';
+import useImage from 'use-image';
+import { Image, Layer, Stage, Transformer } from 'react-konva';
+import { useGardenDimensions } from '../../hooks/useGardenDimensions';
+import type Konva from 'konva';
+import { useGarden } from '../../hooks/useGarden';
 
 interface GardenEditModeProps {
   floorplanUrl: string;
   garden: Garden;
-  aspectRatio: string;
-  transformRef: React.RefObject<ReactZoomPanPinchContentRef | null>;
 }
 
-export const GardenEditMode: React.FC<GardenEditModeProps> = ({ floorplanUrl, garden, aspectRatio, transformRef }) => {
+export const GardenEditMode = ({ floorplanUrl, garden }: GardenEditModeProps) => {
+  const { containerRef, dimensions, meterToPixelScale } = useGardenDimensions(garden);
+  const { updateGarden } = useGarden();
+
+  const [t, setT] = useState({ scale: garden.scale, x: garden.position_x, y: garden.position_y });
+  const imageRef = useRef<Konva.Image>(null);
+  const trRef = useRef<Konva.Transformer>(null);
+
+  const [image] = useImage(floorplanUrl);
+
+  const handleTransform = () => {
+    const node = imageRef.current!;
+    setT({ scale: node.scaleX(), x: node.x(), y: node.y() });
+  };
+
+  const storeTransform = () => {
+    const node = imageRef.current!;
+
+    updateGarden({
+      id: garden.id,
+      scale: node.scaleX(),
+      position_x: node.x(),
+      position_y: node.y(),
+    });
+  };
+
+  useEffect(() => {
+    if (image && imageRef.current && trRef.current) {
+      trRef.current.nodes([imageRef.current]);
+    }
+  }, [image]);
+
   return (
-    <TransformWrapper
-      ref={transformRef}
-      initialScale={garden.scale || 1}
-      initialPositionX={garden.position_x || 0}
-      initialPositionY={garden.position_y || 0}
-      minScale={0.1}
-      maxScale={5}
-      limitToBounds={false}
-      doubleClick={{ disabled: true }}
-    >
-      <TransformComponent
-        wrapperStyle={{
-          width: '100%',
-          height: 'auto',
-          border: '1px solid #e2e8f0',
-        }}
+    <div className="border overflow-hidden relative" ref={containerRef}>
+      <Stage
+        width={dimensions.width}
+        height={dimensions.height}
+        scale={{ x: meterToPixelScale(1), y: meterToPixelScale(1) }}
       >
-        <img
-          className="w-full h-auto object-contain"
-          src={floorplanUrl}
-          alt="Tuinplattegrond"
-          style={{
-            aspectRatio,
-          }}
-          draggable={false}
-        />
-      </TransformComponent>
-    </TransformWrapper>
+        <Layer>
+          {image && (
+            <Image
+              ref={imageRef}
+              image={image}
+              width={garden.width}
+              height={garden.height}
+              scale={{ x: t.scale, y: t.scale }}
+              x={t.x}
+              y={t.y}
+              draggable
+              onTransform={handleTransform}
+              onTransformEnd={storeTransform}
+              onDragEnd={storeTransform}
+            />
+          )}
+          <Transformer
+            ref={trRef}
+            boundBoxFunc={(oldBox, newBox) =>
+              Math.abs(newBox.width) < 10 || Math.abs(newBox.height) < 10 ? oldBox : newBox
+            }
+            enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
+          />
+        </Layer>
+      </Stage>
+    </div>
   );
 };

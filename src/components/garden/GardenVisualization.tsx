@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch';
 
 import { Garden } from '../../api/fetchGarden';
 import { useGardenAxes } from '../../hooks/useGardenAxes';
@@ -11,15 +10,9 @@ interface GardenVisualizationProps {
   garden: Garden;
   floorplanUrl: string;
   mode: GardenMode;
-  transformRef: React.RefObject<ReactZoomPanPinchContentRef | null>;
 }
 
-export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
-  garden,
-  floorplanUrl,
-  mode,
-  transformRef,
-}) => {
+export const GardenVisualization: React.FC<GardenVisualizationProps> = ({ garden, floorplanUrl, mode }) => {
   const horizontalAxisRef = useRef<SVGGElement>(null);
   const verticalAxisRef = useRef<SVGGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,7 +70,7 @@ export const GardenVisualization: React.FC<GardenVisualizationProps> = ({
         )}
 
         <div className="p-[30px]">
-          <GardenEditor garden={garden} floorplanUrl={floorplanUrl} mode={mode} transformRef={transformRef} />
+          <GardenEditor garden={garden} floorplanUrl={floorplanUrl} mode={mode} />
         </div>
       </div>
     </div>

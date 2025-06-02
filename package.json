@@ -30,8 +30,8 @@
     "react-konva": "19.0.4",
     "react-router-dom": "7.6.0",
     "react-select": "5.10.1",
-    "react-zoom-pan-pinch": "3.7.0",
-    "tailwindcss": "4.1.7"
+    "tailwindcss": "4.1.7",
+    "use-image": "1.1.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",

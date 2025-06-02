@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Circle, Layer, Stage } from 'react-konva';
+import { Circle, Image, Layer, Stage } from 'react-konva';
 
 import { Garden } from '../../api/fetchGarden';
 import { colorMap } from './colors';
@@ -8,16 +8,17 @@ import { useGardenMapPoints } from '../../hooks/useGardenMapPoints';
 import { usePlantsQuery } from '../../hooks/usePlants';
 import { Card } from '../ui/Card';
 import { getPlantTypeLabel } from '../plants/utils';
+import useImage from 'use-image';
 
 interface GardenViewModeProps {
   floorplanUrl: string;
   garden: Garden;
-  aspectRatio: string;
 }
 
-export const GardenViewMode: React.FC<GardenViewModeProps> = ({ floorplanUrl, garden, aspectRatio }) => {
+export const GardenViewMode: React.FC<GardenViewModeProps> = ({ floorplanUrl, garden }) => {
   // Use the shared hook for dimensions and scaling
   const { containerRef, dimensions, meterToPixelScale } = useGardenDimensions(garden);
+  const [image] = useImage(floorplanUrl);
 
   const { data: gardenMapPoints, isLoading } = useGardenMapPoints(garden.id);
   const { data: plants } = usePlantsQuery();
@@ -43,28 +44,26 @@ export const GardenViewMode: React.FC<GardenViewModeProps> = ({ floorplanUrl, ga
 
   return (
     <div className="border overflow-hidden relative" ref={containerRef}>
-      <img
-        src={floorplanUrl}
-        alt="Tuinplattegrond"
-        className="w-full h-auto object-contain block"
-        style={{
-          aspectRatio,
-          transform: `translate(${garden.position_x || 0}px, ${garden.position_y || 0}px) scale(${garden.scale || 1})`,
-          transformOrigin: 'left top',
-        }}
-      />
-
       {dimensions.width > 0 && !isLoading && gardenMapPoints && (
         <Stage
           width={dimensions.width}
           height={dimensions.height}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            pointerEvents: 'auto', // Change to auto to allow interactions
-          }}
+          scale={{ x: meterToPixelScale(1), y: meterToPixelScale(1) }}
+          style={{ pointerEvents: 'auto' }}
         >
+          {image && (
+            <Layer>
+              <Image
+                alt="Tuinplattegrond"
+                image={image}
+                width={garden.width}
+                height={garden.height}
+                scale={{ x: garden.scale, y: garden.scale }}
+                x={garden.position_x}
+                y={garden.position_y}
+              />
+            </Layer>
+          )}
           <Layer>
             {gardenMapPoints.map((point) => {
               const plant = plants?.find((p) => p.id === point.plant_id);
@@ -80,9 +79,9 @@ export const GardenViewMode: React.FC<GardenViewModeProps> = ({ floorplanUrl, ga
                   key={point.id}
                   id={point.id}
                   strokeScaleEnabled={false}
-                  x={meterToPixelScale(point.x)}
-                  y={meterToPixelScale(point.y)}
-                  radius={meterToPixelScale(point.radius || 0.5)}
+                  x={point.x}
+                  y={point.y}
+                  radius={point.radius || 0.5}
                   onClick={() => handleCircleClick(point.id)}
                   onTap={() => handleCircleClick(point.id)}
                   cursor={plant ? 'pointer' : 'default'}
