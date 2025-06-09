@@ -35,13 +35,13 @@ export const RegisterPage = () => {
 
       // Check if email is already registered
       if (response.data.user && response.data.user.identities && response.data.user.identities.length === 0) {
-        throw new Error('This email is already registered.');
+        throw new Error('Dit e-mailadres is al geregistreerd.');
       }
 
       return response;
     },
     onSuccess: () => {
-      setMessage('Registration successful! Please check your email to confirm your account.');
+      setMessage('Registratie gelukt! Kijk in je mailbox om je registratie te bevestigen.');
       reset();
     },
   });
@@ -55,10 +55,10 @@ export const RegisterPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <Card title="Create an Account">
+        <Card title="Account aanmaken">
           {registerMutation.isError && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {registerMutation.error?.message || 'Error during registration'}
+              {registerMutation.error?.message || 'Fout tijdens registratie'}
             </div>
           )}
           {message && (
@@ -68,16 +68,16 @@ export const RegisterPage = () => {
             <Input
               id="email"
               type="email"
-              label="Email Address"
+              label="E-mailadres"
               placeholder="you@example.com"
               autoComplete="email"
               error={errors.email?.message}
               disabled={registerMutation.isPending}
               {...register('email', {
-                required: 'Email is required',
+                required: 'E-mailadres is verplicht',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address',
+                  message: 'Verkeerd e-mailadres',
                 },
               })}
             />
@@ -85,16 +85,16 @@ export const RegisterPage = () => {
             <Input
               id="password"
               type="password"
-              label="Password"
-              placeholder="Enter your password"
+              label="Wachtwoord"
+              placeholder="Vul je wachtwoord in"
               autoComplete="new-password"
               error={errors.password?.message}
               disabled={registerMutation.isPending}
               {...register('password', {
-                required: 'Password is required',
+                required: 'Wachtwoord is verplicht',
                 minLength: {
                   value: 6,
-                  message: 'Password must be at least 6 characters',
+                  message: 'Wachwoord moet minimaal 6 tekens bevatten',
                 },
               })}
             />
@@ -102,25 +102,25 @@ export const RegisterPage = () => {
             <Input
               id="confirmPassword"
               type="password"
-              label="Confirm Password"
-              placeholder="Confirm your password"
+              label="Bevestig wachtwoord"
+              placeholder="Bevestig je wachtwoord"
               autoComplete="new-password"
               error={errors.confirmPassword?.message}
               disabled={registerMutation.isPending}
               {...register('confirmPassword', {
-                required: 'Please confirm your password',
-                validate: (value) => value === password || 'The passwords do not match',
+                required: 'Bevestig je wachtwoord',
+                validate: (value) => value === password || 'De wachtwoorden komen niet overeen',
               })}
             />
 
             <Button type="submit" fullWidth isLoading={registerMutation.isPending}>
-              Register
+              Registreer
             </Button>
           </form>
 
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
-              Already have an account?{' '}
+              Heb je al een account?{' '}
               <Link to="/login" className="text-green-600 hover:text-green-500 font-medium">
                 Log in
               </Link>

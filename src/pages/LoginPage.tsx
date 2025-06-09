@@ -49,10 +49,10 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <Card title="Login to Tuin App">
+        <Card title="Tuin App inloggen">
           {loginMutation.isError && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {loginMutation.error?.message || 'Error logging in'}
+              {loginMutation.error?.message || 'Fout tijdens het inloggen.'}
             </div>
           )}
 
@@ -60,16 +60,16 @@ export const LoginPage = () => {
             <Input
               id="email"
               type="email"
-              label="Email Address"
+              label="E-mailadres"
               placeholder="you@example.com"
               autoComplete="email"
               error={errors.email?.message}
               disabled={loginMutation.isPending}
               {...register('email', {
-                required: 'Email is required',
+                required: 'E-mail is verplicht',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address',
+                  message: 'Verkeerd e-mailadres',
                 },
               })}
             />
@@ -78,12 +78,12 @@ export const LoginPage = () => {
               id="password"
               type="password"
               label="Password"
-              placeholder="Enter your password"
+              placeholder="Vul je wachtwoord in"
               autoComplete="current-password"
               error={errors.password?.message}
               disabled={loginMutation.isPending}
               {...register('password', {
-                required: 'Password is required',
+                required: 'Wachtwoord is verplicht',
               })}
             />
 
@@ -94,9 +94,9 @@ export const LoginPage = () => {
 
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
-              Need an account?{' '}
+              Nog geen account?{' '}
               <Link to="/register" className="text-green-600 hover:text-green-500 font-medium">
-                Register here
+                Registreer hier
               </Link>
             </p>
           </div>
