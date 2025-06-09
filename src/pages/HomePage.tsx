@@ -110,7 +110,7 @@ export const HomePage = () => {
             ) : (
               <div className="text-center p-6">
                 <p className="text-gray-500">Nog geen planten toegevoegd</p>
-                <a href="/add-plant" className="mt-3 inline-block text-green-600 hover:text-green-700 font-medium">
+                <a href="/plants/add" className="mt-3 inline-block text-green-600 hover:text-green-700 font-medium">
                   Plant toevoegen
                 </a>
               </div>
