@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
+    "typecheck": "tsc --project tsconfig.app.json --noEmit",
     "generate-types": "supabase gen types typescript --project-id rkiockcuapvnnxrdwrwn > ./src/lib/supabase/database.types.ts"
   },
   "dependencies": {

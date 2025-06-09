@@ -116,7 +116,7 @@ export const EditGardenPage = () => {
             <label className="block text-sm font-medium mb-1">Tuinplattegrond</label>
             <div className="flex items-center">
               <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
-              <Button type="button" onClick={() => fileInputRef.current?.click()} className="mr-2" variant="outline">
+              <Button type="button" onClick={() => fileInputRef.current?.click()} className="mr-2" variant="secondary">
                 Bestand kiezen
               </Button>
               <span className="text-sm text-gray-500 mr-2">
@@ -126,7 +126,7 @@ export const EditGardenPage = () => {
                 <Button
                   type="button"
                   onClick={handleClearImage}
-                  variant="outline"
+                  variant="secondary"
                   className="text-red-500 border-red-300 hover:bg-red-50"
                 >
                   Wissen
@@ -145,7 +145,7 @@ export const EditGardenPage = () => {
             <Button type="submit" disabled={isUpdating || isUploading}>
               {isUpdating || isUploading ? 'Bezig met opslaan...' : 'Opslaan'}
             </Button>
-            <Button type="button" variant="outline" onClick={() => navigate('/garden')}>
+            <Button type="button" variant="secondary" onClick={() => navigate('/garden')}>
               Annuleren
             </Button>
           </div>

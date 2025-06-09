@@ -43,7 +43,7 @@ export const useAddGardenMapPointMutation = () => {
 
   return useMutation({
     mutationFn: (point: GardenMapPointInput) => addGardenMapPoint(point),
-    onSuccess: (result, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['gardenMapPoints', variables.garden_id],
       });
